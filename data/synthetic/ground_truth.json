@@ -1,0 +1,93 @@
+{
+  "total_baseline_income": 720000,
+  "total_expenses_net": 591602,
+  "total_savings": 128398,
+  "total_investments": 109000,
+  "one_time_income": 38000,
+  "monthly": {
+    "2025-10": {
+      "income": 60000,
+      "expenses": 44878,
+      "savings": 15122
+    },
+    "2025-11": {
+      "income": 60000,
+      "expenses": 39252,
+      "savings": 20748
+    },
+    "2025-12": {
+      "income": 60000,
+      "expenses": 67808,
+      "savings": -7808
+    },
+    "2026-01": {
+      "income": 60000,
+      "expenses": 37205,
+      "savings": 22795
+    },
+    "2026-02": {
+      "income": 60000,
+      "expenses": 38142,
+      "savings": 21858
+    },
+    "2026-03": {
+      "income": 60000,
+      "expenses": 35595,
+      "savings": 24405
+    },
+    "2026-04": {
+      "income": 60000,
+      "expenses": 91328,
+      "savings": -31328
+    },
+    "2026-05": {
+      "income": 60000,
+      "expenses": 44441,
+      "savings": 15559
+    },
+    "2026-06": {
+      "income": 60000,
+      "expenses": 40282,
+      "savings": 19718
+    },
+    "2026-07": {
+      "income": 60000,
+      "expenses": 47104,
+      "savings": 12896
+    },
+    "2026-08": {
+      "income": 60000,
+      "expenses": 60125,
+      "savings": -125
+    },
+    "2026-09": {
+      "income": 60000,
+      "expenses": 45442,
+      "savings": 14558
+    }
+  },
+  "category_expenses_net": {
+    "Bills & Utilities": 30117,
+    "Entertainment": 27500,
+    "Food": 60832,
+    "Groceries": 50185,
+    "Healthcare": 27985,
+    "Other": 7050,
+    "Rent/Housing": 216000,
+    "Shopping": 117906,
+    "Transport": 26027,
+    "Travel": 28000
+  },
+  "counts": {
+    "total_events": 468,
+    "bank_rows": 424,
+    "card_rows": 44,
+    "overlap_duplicates": 5,
+    "identical_pairs": 3,
+    "refunds": 3,
+    "transfers": 4,
+    "cc_payments": 12,
+    "upi_to_friends": 6,
+    "reimbursements": 3
+  }
+}

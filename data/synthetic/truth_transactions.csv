@@ -1,0 +1,469 @@
+date,description,amount,category,txn_type,account,one_time
+2025-10-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2025-10-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2025-10-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2025-10-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2025-10-07,BESCOM ELECTRICITY,-1554,Bills & Utilities,expense,bank,False
+2025-10-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2025-10-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2025-10-10,ZOMATO,-579,Food,expense,bank,False
+2025-10-10,ZOMATO,-582,Food,expense,bank,False
+2025-10-11,SWIGGY,-245,Food,expense,bank,False
+2025-10-11,AMAZON,-1856,Shopping,expense,card,False
+2025-10-12,DOMINOS PIZZA,-249,Food,expense,bank,False
+2025-10-12,AMAZON,-3208,Shopping,expense,bank,False
+2025-10-12,NAMMA METRO,-385,Transport,expense,bank,False
+2025-10-13,OLA,-202,Transport,expense,bank,False
+2025-10-14,FLIPKART,-1424,Shopping,expense,card,False
+2025-10-15,OLA,-241,Transport,expense,bank,False
+2025-10-15,NAMMA METRO,-433,Transport,expense,bank,False
+2025-10-15,BOOKMYSHOW,-538,Entertainment,expense,bank,False
+2025-10-16,ZOMATO,-667,Food,expense,bank,False
+2025-10-16,CAFE COFFEE DAY,-254,Food,expense,bank,False
+2025-10-16,NAMMA METRO,-196,Transport,expense,bank,False
+2025-10-17,DOMINOS PIZZA,-434,Food,expense,bank,False
+2025-10-19,BLINKIT,-1566,Groceries,expense,bank,False
+2025-10-19,UBER,-179,Transport,expense,bank,False
+2025-10-20,CAFE COFFEE DAY,-309,Food,expense,bank,False
+2025-10-21,CAFE COFFEE DAY,-420,Food,expense,bank,False
+2025-10-22,BIGBASKET,-1430,Groceries,expense,bank,False
+2025-10-24,BLINKIT,-555,Groceries,expense,bank,False
+2025-10-24,NAMMA METRO,-246,Transport,expense,bank,False
+2025-10-25,SPOTIFY,-1849,Entertainment,expense,card,False
+2025-10-25,AMAZON,-1730,Shopping,expense,card,False
+2025-10-27,APOLLO PHARMACY,-864,Healthcare,expense,bank,False
+2025-10-28,AMAZON,-3385,Shopping,expense,bank,False
+2025-10-28,CREDIT CARD BILL PAYMENT HDFC,-6859,Transfer,cc_payment,bank,False
+2025-11-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2025-11-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2025-11-03,TRANSFER TO OWN SAVINGS AC,-10000,Transfer,transfer,bank,False
+2025-11-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2025-11-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2025-11-07,BESCOM ELECTRICITY,-1014,Bills & Utilities,expense,bank,False
+2025-11-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2025-11-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2025-11-10,DOMINOS PIZZA,-936,Food,expense,card,False
+2025-11-12,BIGBASKET,-524,Groceries,expense,bank,False
+2025-11-13,NAMMA METRO,-334,Transport,expense,bank,False
+2025-11-13,OLA,-282,Transport,expense,bank,False
+2025-11-13,DOMINOS PIZZA,-760,Food,expense,card,False
+2025-11-14,CAFE COFFEE DAY,-292,Food,expense,bank,False
+2025-11-14,BLINKIT,-1310,Groceries,expense,bank,False
+2025-11-14,BLINKIT,-627,Groceries,expense,bank,False
+2025-11-14,CHAI POINT,-50,Food,expense,bank,False
+2025-11-14,CHAI POINT,-50,Food,expense,bank,False
+2025-11-15,OLA,-61,Transport,expense,bank,False
+2025-11-15,NAMMA METRO,-114,Transport,expense,bank,False
+2025-11-15,SPOTIFY,-693,Entertainment,expense,bank,False
+2025-11-16,CAFE COFFEE DAY,-367,Food,expense,bank,False
+2025-11-16,NETFLIX,-532,Entertainment,expense,bank,False
+2025-11-16,UPI RAHUL SHARMA,-1700,Other,expense,bank,False
+2025-11-17,SWIGGY,-473,Food,expense,bank,False
+2025-11-17,CAFE COFFEE DAY,-588,Food,expense,bank,False
+2025-11-17,SPOTIFY,-1546,Entertainment,expense,card,False
+2025-11-18,NAMMA METRO,-234,Transport,expense,bank,False
+2025-11-18,NAMMA METRO,-450,Transport,expense,bank,False
+2025-11-18,UPI RECEIVED RAHUL SHARMA,850,Other,reimbursement,bank,False
+2025-11-19,SPOTIFY,-669,Entertainment,expense,bank,False
+2025-11-22,CAFE COFFEE DAY,-217,Food,expense,bank,False
+2025-11-22,DMART,-749,Groceries,expense,bank,False
+2025-11-22,MYNTRA,-2417,Shopping,expense,bank,False
+2025-11-23,BLINKIT,-430,Groceries,expense,bank,False
+2025-11-25,DOMINOS PIZZA,-619,Food,expense,bank,False
+2025-11-26,FLIPKART,-2766,Shopping,expense,bank,False
+2025-11-28,CREDIT CARD BILL PAYMENT HDFC,-3242,Transfer,cc_payment,bank,False
+2025-12-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2025-12-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2025-12-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2025-12-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2025-12-07,BESCOM ELECTRICITY,-925,Bills & Utilities,expense,bank,False
+2025-12-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2025-12-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2025-12-10,BLINKIT,-1434,Groceries,expense,bank,False
+2025-12-10,BIGBASKET,-1749,Groceries,expense,bank,False
+2025-12-11,AMAZON,-776,Shopping,expense,bank,False
+2025-12-11,FLIPKART,-790,Shopping,expense,bank,False
+2025-12-11,NAMMA METRO,-394,Transport,expense,bank,False
+2025-12-13,CAFE COFFEE DAY,-464,Food,expense,bank,False
+2025-12-13,UBER,-266,Transport,expense,bank,False
+2025-12-14,ZOMATO,-636,Food,expense,bank,False
+2025-12-16,NAMMA METRO,-127,Transport,expense,bank,False
+2025-12-16,UBER,-109,Transport,expense,bank,False
+2025-12-16,SPOTIFY,-609,Entertainment,expense,bank,False
+2025-12-17,SWIGGY,-396,Food,expense,bank,False
+2025-12-17,BIGBASKET,-992,Groceries,expense,bank,False
+2025-12-17,BLINKIT,-751,Groceries,expense,bank,False
+2025-12-17,OLA,-268,Transport,expense,bank,False
+2025-12-17,FLIPKART,-1267,Shopping,expense,card,False
+2025-12-18,FLIPKART,-1342,Shopping,expense,card,False
+2025-12-20,DOMINOS PIZZA,-169,Food,expense,bank,False
+2025-12-20,UBER,-187,Transport,expense,bank,False
+2025-12-22,CAFE COFFEE DAY,-598,Food,expense,bank,False
+2025-12-22,MAKEMYTRIP GOA TRIP,-28000,Travel,expense,bank,False
+2025-12-23,OLA,-276,Transport,expense,bank,False
+2025-12-23,OLA,-433,Transport,expense,bank,False
+2025-12-24,BIGBASKET,-807,Groceries,expense,bank,False
+2025-12-25,SWIGGY,-695,Food,expense,bank,False
+2025-12-25,SPOTIFY,-615,Entertainment,expense,card,False
+2025-12-26,DOMINOS PIZZA,-366,Food,expense,bank,False
+2025-12-26,AMAZON,-1640,Shopping,expense,bank,False
+2025-12-27,ZOMATO,-421,Food,expense,bank,False
+2025-12-27,ZOMATO,-469,Food,expense,bank,False
+2025-12-28,SWIGGY,-237,Food,expense,bank,False
+2025-12-28,NAMMA METRO,-302,Transport,expense,bank,False
+2025-12-28,CREDIT CARD BILL PAYMENT HDFC,-3224,Transfer,cc_payment,bank,False
+2026-01-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-01-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-01-03,TRANSFER TO OWN SAVINGS AC,-10000,Transfer,transfer,bank,False
+2026-01-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-01-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-01-07,BESCOM ELECTRICITY,-1181,Bills & Utilities,expense,bank,False
+2026-01-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-01-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-01-10,BOOKMYSHOW,-847,Entertainment,expense,card,False
+2026-01-11,NAMMA METRO,-101,Transport,expense,bank,False
+2026-01-12,UBER,-95,Transport,expense,bank,False
+2026-01-12,NAMMA METRO,-180,Transport,expense,bank,False
+2026-01-12,ZERODHA BROKERAGE TRANSFER,-15000,Investment/Savings,investment,bank,False
+2026-01-14,AMAZON,-690,Shopping,expense,card,False
+2026-01-15,CAFE COFFEE DAY,-623,Food,expense,bank,False
+2026-01-15,UBER,-320,Transport,expense,bank,False
+2026-01-17,SWIGGY,-603,Food,expense,bank,False
+2026-01-17,ZOMATO,-566,Food,expense,bank,False
+2026-01-17,NAMMA METRO,-364,Transport,expense,bank,False
+2026-01-18,DOMINOS PIZZA,-442,Food,expense,bank,False
+2026-01-18,UBER,-402,Transport,expense,bank,False
+2026-01-18,UPI PRIYA NAIR,-1300,Other,expense,bank,False
+2026-01-19,BIGBASKET,-419,Groceries,expense,bank,False
+2026-01-19,BOOKMYSHOW,-473,Entertainment,expense,bank,False
+2026-01-20,AMAZON,-705,Shopping,expense,bank,False
+2026-01-20,NETFLIX,-421,Entertainment,expense,bank,False
+2026-01-20,UPI RECEIVED PRIYA NAIR,650,Other,reimbursement,bank,False
+2026-01-22,SWIGGY,-318,Food,expense,bank,False
+2026-01-22,SWIGGY,-549,Food,expense,bank,False
+2026-01-22,UBER,-351,Transport,expense,bank,False
+2026-01-22,NETFLIX,-837,Entertainment,expense,bank,False
+2026-01-22,REFUND AMAZON,705,Shopping,refund,bank,False
+2026-01-23,NAMMA METRO,-358,Transport,expense,bank,False
+2026-01-23,FLIPKART,-1882,Shopping,expense,card,False
+2026-01-25,DOMINOS PIZZA,-368,Food,expense,bank,False
+2026-01-25,BIGBASKET,-688,Groceries,expense,bank,False
+2026-01-25,NAMMA METRO,-331,Transport,expense,bank,False
+2026-01-27,SWIGGY,-201,Food,expense,bank,False
+2026-01-27,SWIGGY,-245,Food,expense,bank,False
+2026-01-27,BLINKIT,-1771,Groceries,expense,bank,False
+2026-01-28,BLINKIT,-1410,Groceries,expense,bank,False
+2026-01-28,NAMMA METRO,-221,Transport,expense,bank,False
+2026-01-28,CREDIT CARD BILL PAYMENT HDFC,-3419,Transfer,cc_payment,bank,False
+2026-02-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-02-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-02-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-02-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-02-07,BESCOM ELECTRICITY,-1150,Bills & Utilities,expense,bank,False
+2026-02-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-02-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-02-10,OLA,-126,Transport,expense,bank,False
+2026-02-12,ZOMATO,-528,Food,expense,bank,False
+2026-02-12,SPOTIFY,-302,Entertainment,expense,bank,False
+2026-02-13,BIGBASKET,-841,Groceries,expense,bank,False
+2026-02-13,BIGBASKET,-1433,Groceries,expense,bank,False
+2026-02-17,MYNTRA,-686,Shopping,expense,card,False
+2026-02-18,ZOMATO,-507,Food,expense,bank,False
+2026-02-18,FLIPKART,-2977,Shopping,expense,bank,False
+2026-02-18,NAMMA METRO,-310,Transport,expense,bank,False
+2026-02-18,UBER,-107,Transport,expense,bank,False
+2026-02-18,UBER,-439,Transport,expense,bank,False
+2026-02-19,ZOMATO,-598,Food,expense,bank,False
+2026-02-20,UBER,-411,Transport,expense,bank,False
+2026-02-20,CHAI POINT,-50,Food,expense,bank,False
+2026-02-20,CHAI POINT,-50,Food,expense,bank,False
+2026-02-22,FLIPKART,-1430,Shopping,expense,card,False
+2026-02-23,OLA,-82,Transport,expense,bank,False
+2026-02-24,SWIGGY,-225,Food,expense,bank,False
+2026-02-24,NAMMA METRO,-421,Transport,expense,bank,False
+2026-02-25,NETFLIX,-1487,Entertainment,expense,card,False
+2026-02-25,FLIPKART,-1403,Shopping,expense,card,False
+2026-02-27,ZOMATO,-668,Food,expense,bank,False
+2026-02-27,CAFE COFFEE DAY,-691,Food,expense,bank,False
+2026-02-27,DMART,-1658,Groceries,expense,bank,False
+2026-02-27,NETFLIX,-264,Entertainment,expense,bank,False
+2026-02-28,CREDIT CARD BILL PAYMENT HDFC,-5006,Transfer,cc_payment,bank,False
+2026-03-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-03-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-03-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-03-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-03-07,BESCOM ELECTRICITY,-1128,Bills & Utilities,expense,bank,False
+2026-03-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-03-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-03-10,MYNTRA,-1291,Shopping,expense,bank,False
+2026-03-11,PRACTO,-203,Healthcare,expense,bank,False
+2026-03-12,REFUND MYNTRA,1291,Shopping,refund,bank,False
+2026-03-13,OLA,-151,Transport,expense,bank,False
+2026-03-13,NAMMA METRO,-282,Transport,expense,bank,False
+2026-03-14,SWIGGY,-465,Food,expense,bank,False
+2026-03-14,FLIPKART,-1090,Shopping,expense,card,False
+2026-03-15,BONUS ACME TECH,30000,Other Income,income,bank,True
+2026-03-15,BLINKIT,-521,Groceries,expense,bank,False
+2026-03-16,ZOMATO,-255,Food,expense,bank,False
+2026-03-17,ZOMATO,-331,Food,expense,bank,False
+2026-03-17,BIGBASKET,-1242,Groceries,expense,bank,False
+2026-03-18,OLA,-388,Transport,expense,bank,False
+2026-03-20,DOMINOS PIZZA,-404,Food,expense,bank,False
+2026-03-20,OLA,-95,Transport,expense,bank,False
+2026-03-20,SWIGGY,-558,Food,expense,card,False
+2026-03-21,SWIGGY,-516,Food,expense,bank,False
+2026-03-21,DOMINOS PIZZA,-308,Food,expense,bank,False
+2026-03-21,DMART,-766,Groceries,expense,bank,False
+2026-03-21,NAMMA METRO,-220,Transport,expense,bank,False
+2026-03-21,UPI AMIT VERMA,-500,Other,expense,bank,False
+2026-03-22,BIGBASKET,-1263,Groceries,expense,bank,False
+2026-03-22,SPOTIFY,-344,Entertainment,expense,bank,False
+2026-03-23,SWIGGY,-333,Food,expense,bank,False
+2026-03-23,NAMMA METRO,-321,Transport,expense,bank,False
+2026-03-23,SWIGGY,-1888,Food,expense,card,False
+2026-03-23,UPI RECEIVED AMIT VERMA,250,Other,reimbursement,bank,False
+2026-03-25,MYNTRA,-1825,Shopping,expense,card,False
+2026-03-26,OLA,-407,Transport,expense,bank,False
+2026-03-27,OLA,-74,Transport,expense,bank,False
+2026-03-28,ZOMATO,-590,Food,expense,bank,False
+2026-03-28,OLA,-79,Transport,expense,bank,False
+2026-03-28,PPF DEPOSIT SBI,-10000,Investment/Savings,investment,bank,False
+2026-03-28,CREDIT CARD BILL PAYMENT HDFC,-5361,Transfer,cc_payment,bank,False
+2026-04-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-04-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-04-03,TRANSFER TO OWN SAVINGS AC,-10000,Transfer,transfer,bank,False
+2026-04-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-04-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-04-07,BESCOM ELECTRICITY,-1042,Bills & Utilities,expense,bank,False
+2026-04-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-04-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-04-10,UBER,-277,Transport,expense,bank,False
+2026-04-11,AMAZON,-2446,Shopping,expense,bank,False
+2026-04-12,DMART,-1355,Groceries,expense,bank,False
+2026-04-12,OLA,-272,Transport,expense,bank,False
+2026-04-15,PRACTO,-1121,Healthcare,expense,bank,False
+2026-04-16,AMAZON,-600,Shopping,expense,bank,False
+2026-04-17,UBER,-395,Transport,expense,bank,False
+2026-04-17,UBER,-416,Transport,expense,bank,False
+2026-04-18,CROMA LAPTOP,-45000,Shopping,expense,bank,False
+2026-04-19,ZOMATO,-590,Food,expense,bank,False
+2026-04-19,AMAZON,-3803,Shopping,expense,bank,False
+2026-04-20,SWIGGY,-457,Food,expense,bank,False
+2026-04-20,DOMINOS PIZZA,-452,Food,expense,bank,False
+2026-04-20,DMART,-1204,Groceries,expense,bank,False
+2026-04-20,BIGBASKET,-781,Groceries,expense,bank,False
+2026-04-22,OLA,-264,Transport,expense,bank,False
+2026-04-22,MYNTRA,-1576,Shopping,expense,card,False
+2026-04-23,SWIGGY,-488,Food,expense,bank,False
+2026-04-23,DOMINOS PIZZA,-328,Food,expense,bank,False
+2026-04-23,SPOTIFY,-595,Entertainment,expense,card,False
+2026-04-24,BLINKIT,-737,Groceries,expense,bank,False
+2026-04-24,UBER,-297,Transport,expense,bank,False
+2026-04-24,SPOTIFY,-886,Entertainment,expense,bank,False
+2026-04-24,SWIGGY,-1377,Food,expense,card,False
+2026-04-25,CAFE COFFEE DAY,-453,Food,expense,card,False
+2026-04-26,CAFE COFFEE DAY,-568,Food,expense,bank,False
+2026-04-26,DMART,-647,Groceries,expense,bank,False
+2026-04-26,OLA,-85,Transport,expense,bank,False
+2026-04-26,NAMMA METRO,-364,Transport,expense,bank,False
+2026-04-26,BOOKMYSHOW,-711,Entertainment,expense,bank,False
+2026-04-27,ZOMATO,-522,Food,expense,bank,False
+2026-04-27,ZOMATO,-346,Food,expense,bank,False
+2026-04-27,SWIGGY,-461,Food,expense,bank,False
+2026-04-27,UBER,-122,Transport,expense,bank,False
+2026-04-28,CAFE COFFEE DAY,-565,Food,expense,bank,False
+2026-04-28,UBER,-427,Transport,expense,bank,False
+2026-04-28,CREDIT CARD BILL PAYMENT HDFC,-4001,Transfer,cc_payment,bank,False
+2026-05-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-05-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-05-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-05-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-05-07,BESCOM ELECTRICITY,-1004,Bills & Utilities,expense,bank,False
+2026-05-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-05-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-05-10,DMART,-911,Groceries,expense,bank,False
+2026-05-10,UBER,-389,Transport,expense,bank,False
+2026-05-11,BOOKMYSHOW,-538,Entertainment,expense,bank,False
+2026-05-12,ZOMATO,-1564,Food,expense,card,False
+2026-05-14,ZOMATO,-542,Food,expense,bank,False
+2026-05-14,ZOMATO,-215,Food,expense,bank,False
+2026-05-16,DMART,-1097,Groceries,expense,bank,False
+2026-05-16,PRACTO,-869,Healthcare,expense,bank,False
+2026-05-17,CAFE COFFEE DAY,-683,Food,expense,bank,False
+2026-05-17,CAFE COFFEE DAY,-493,Food,expense,bank,False
+2026-05-17,OLA,-283,Transport,expense,bank,False
+2026-05-17,UPI NEHA GUPTA,-2300,Other,expense,bank,False
+2026-05-20,SWIGGY,-291,Food,expense,bank,False
+2026-05-20,NAMMA METRO,-407,Transport,expense,bank,False
+2026-05-22,NAMMA METRO,-144,Transport,expense,bank,False
+2026-05-22,FLIPKART,-1681,Shopping,expense,card,False
+2026-05-23,DOMINOS PIZZA,-488,Food,expense,bank,False
+2026-05-23,MYNTRA,-3561,Shopping,expense,bank,False
+2026-05-23,UBER,-296,Transport,expense,bank,False
+2026-05-24,SWIGGY,-442,Food,expense,bank,False
+2026-05-24,DMART,-427,Groceries,expense,bank,False
+2026-05-24,UBER,-378,Transport,expense,bank,False
+2026-05-25,ZOMATO,-431,Food,expense,bank,False
+2026-05-25,UBER,-259,Transport,expense,bank,False
+2026-05-25,SPOTIFY,-1771,Entertainment,expense,card,False
+2026-05-27,MYNTRA,-1403,Shopping,expense,bank,False
+2026-05-27,UBER,-261,Transport,expense,bank,False
+2026-05-28,BLINKIT,-340,Groceries,expense,bank,False
+2026-05-28,DMART,-1276,Groceries,expense,bank,False
+2026-05-28,NAMMA METRO,-399,Transport,expense,bank,False
+2026-05-28,CREDIT CARD BILL PAYMENT HDFC,-5016,Transfer,cc_payment,bank,False
+2026-06-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-06-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-06-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-06-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-06-07,BESCOM ELECTRICITY,-1592,Bills & Utilities,expense,bank,False
+2026-06-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-06-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-06-09,CHAI POINT,-50,Food,expense,bank,False
+2026-06-09,CHAI POINT,-50,Food,expense,bank,False
+2026-06-10,SWIGGY,-508,Food,expense,bank,False
+2026-06-10,ZOMATO,-354,Food,expense,bank,False
+2026-06-10,ZOMATO,-394,Food,expense,bank,False
+2026-06-11,CAFE COFFEE DAY,-964,Food,expense,card,False
+2026-06-12,MYNTRA,-3328,Shopping,expense,bank,False
+2026-06-12,DOMINOS PIZZA,-1829,Food,expense,card,False
+2026-06-13,BIGBASKET,-937,Groceries,expense,bank,False
+2026-06-13,BLINKIT,-352,Groceries,expense,bank,False
+2026-06-13,NAMMA METRO,-214,Transport,expense,bank,False
+2026-06-13,NAMMA METRO,-81,Transport,expense,bank,False
+2026-06-13,DOMINOS PIZZA,-1857,Food,expense,card,False
+2026-06-14,DOMINOS PIZZA,-267,Food,expense,bank,False
+2026-06-14,BOOKMYSHOW,-330,Entertainment,expense,bank,False
+2026-06-14,REFUND MYNTRA,3328,Shopping,refund,bank,False
+2026-06-17,SWIGGY,-191,Food,expense,bank,False
+2026-06-18,SWIGGY,-631,Food,expense,bank,False
+2026-06-18,DMART,-643,Groceries,expense,bank,False
+2026-06-19,BLINKIT,-1687,Groceries,expense,bank,False
+2026-06-19,SWIGGY,-1721,Food,expense,card,False
+2026-06-20,UBER,-275,Transport,expense,bank,False
+2026-06-21,NAMMA METRO,-279,Transport,expense,bank,False
+2026-06-21,UBER,-319,Transport,expense,bank,False
+2026-06-21,NAMMA METRO,-295,Transport,expense,bank,False
+2026-06-22,CAFE COFFEE DAY,-581,Food,expense,bank,False
+2026-06-22,DMART,-1764,Groceries,expense,bank,False
+2026-06-25,UBER,-281,Transport,expense,bank,False
+2026-06-26,SPOTIFY,-426,Entertainment,expense,bank,False
+2026-06-27,BOOKMYSHOW,-626,Entertainment,expense,bank,False
+2026-06-28,ZOMATO,-626,Food,expense,bank,False
+2026-06-28,PRACTO,-860,Healthcare,expense,bank,False
+2026-06-28,CREDIT CARD BILL PAYMENT HDFC,-6371,Transfer,cc_payment,bank,False
+2026-07-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-07-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-07-03,TRANSFER TO OWN SAVINGS AC,-10000,Transfer,transfer,bank,False
+2026-07-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-07-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-07-07,BESCOM ELECTRICITY,-1458,Bills & Utilities,expense,bank,False
+2026-07-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-07-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-07-10,AMAZON,-1705,Shopping,expense,bank,False
+2026-07-12,CAFE COFFEE DAY,-611,Food,expense,bank,False
+2026-07-12,BIGBASKET,-1774,Groceries,expense,bank,False
+2026-07-13,APOLLO PHARMACY,-806,Healthcare,expense,bank,False
+2026-07-14,AMAZON,-1182,Shopping,expense,card,False
+2026-07-14,AMAZON,-1494,Shopping,expense,card,False
+2026-07-15,NETFLIX,-1143,Entertainment,expense,card,False
+2026-07-16,CAFE COFFEE DAY,-414,Food,expense,bank,False
+2026-07-16,OLA,-121,Transport,expense,bank,False
+2026-07-16,NETFLIX,-645,Entertainment,expense,bank,False
+2026-07-17,DOMINOS PIZZA,-538,Food,expense,bank,False
+2026-07-17,BLINKIT,-1275,Groceries,expense,bank,False
+2026-07-17,FLIPKART,-3333,Shopping,expense,bank,False
+2026-07-18,UBER,-121,Transport,expense,bank,False
+2026-07-18,SPOTIFY,-753,Entertainment,expense,bank,False
+2026-07-19,NAMMA METRO,-357,Transport,expense,bank,False
+2026-07-19,UPI KARAN SHAH,-600,Other,expense,bank,False
+2026-07-20,INCOME TAX REFUND,8000,Other Income,income,bank,True
+2026-07-20,SWIGGY,-656,Food,expense,bank,False
+2026-07-20,ZOMATO,-649,Food,expense,bank,False
+2026-07-20,CAFE COFFEE DAY,-432,Food,expense,bank,False
+2026-07-21,OLA,-343,Transport,expense,bank,False
+2026-07-22,ZOMATO,-461,Food,expense,card,False
+2026-07-23,DMART,-1437,Groceries,expense,bank,False
+2026-07-24,OLA,-216,Transport,expense,bank,False
+2026-07-25,FLIPKART,-3747,Shopping,expense,bank,False
+2026-07-26,OLA,-277,Transport,expense,bank,False
+2026-07-27,SWIGGY,-679,Food,expense,bank,False
+2026-07-27,OLA,-240,Transport,expense,bank,False
+2026-07-27,SPOTIFY,-339,Entertainment,expense,bank,False
+2026-07-28,CREDIT CARD BILL PAYMENT HDFC,-4280,Transfer,cc_payment,bank,False
+2026-08-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-08-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-08-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-08-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-08-07,BESCOM ELECTRICITY,-989,Bills & Utilities,expense,bank,False
+2026-08-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-08-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-08-10,ZOMATO,-430,Food,expense,bank,False
+2026-08-10,CAFE COFFEE DAY,-630,Food,expense,bank,False
+2026-08-11,SWIGGY,-449,Food,expense,bank,False
+2026-08-11,BIGBASKET,-605,Groceries,expense,bank,False
+2026-08-12,UBER,-182,Transport,expense,bank,False
+2026-08-12,APOLLO HOSPITAL,-22000,Healthcare,expense,bank,False
+2026-08-13,BIGBASKET,-1120,Groceries,expense,bank,False
+2026-08-13,MYNTRA,-3631,Shopping,expense,bank,False
+2026-08-13,UBER,-380,Transport,expense,bank,False
+2026-08-14,DOMINOS PIZZA,-255,Food,expense,bank,False
+2026-08-15,SWIGGY,-408,Food,expense,bank,False
+2026-08-15,NAMMA METRO,-98,Transport,expense,bank,False
+2026-08-15,UBER,-269,Transport,expense,bank,False
+2026-08-15,NETFLIX,-1419,Entertainment,expense,card,False
+2026-08-16,OLA,-398,Transport,expense,bank,False
+2026-08-17,NAMMA METRO,-254,Transport,expense,bank,False
+2026-08-17,BOOKMYSHOW,-873,Entertainment,expense,bank,False
+2026-08-19,MYNTRA,-1007,Shopping,expense,card,False
+2026-08-21,ZOMATO,-459,Food,expense,bank,False
+2026-08-24,OLA,-212,Transport,expense,bank,False
+2026-08-24,APOLLO PHARMACY,-678,Healthcare,expense,bank,False
+2026-08-24,BOOKMYSHOW,-820,Entertainment,expense,card,False
+2026-08-24,BOOKMYSHOW,-319,Entertainment,expense,card,False
+2026-08-25,DOMINOS PIZZA,-498,Food,expense,bank,False
+2026-08-25,BIGBASKET,-1481,Groceries,expense,bank,False
+2026-08-25,BOOKMYSHOW,-183,Entertainment,expense,bank,False
+2026-08-28,DMART,-474,Groceries,expense,bank,False
+2026-08-28,OLA,-216,Transport,expense,bank,False
+2026-08-28,NAMMA METRO,-90,Transport,expense,bank,False
+2026-08-28,CREDIT CARD BILL PAYMENT HDFC,-3565,Transfer,cc_payment,bank,False
+2026-09-01,SALARY ACME TECH PVT LTD,60000,Salary,income,bank,False
+2026-09-02,RENT TO LANDLORD,-18000,Rent/Housing,expense,bank,False
+2026-09-05,SIP HDFC MUTUAL FUND,-5000,Investment/Savings,investment,bank,False
+2026-09-06,RD HDFC BANK,-2000,Investment/Savings,investment,bank,False
+2026-09-07,BESCOM ELECTRICITY,-1504,Bills & Utilities,expense,bank,False
+2026-09-08,AIRTEL BROADBAND,-999,Bills & Utilities,expense,bank,False
+2026-09-09,JIO MOBILE RECHARGE,-299,Bills & Utilities,expense,bank,False
+2026-09-10,MYNTRA,-3864,Shopping,expense,bank,False
+2026-09-10,SPOTIFY,-705,Entertainment,expense,bank,False
+2026-09-10,SPOTIFY,-904,Entertainment,expense,card,False
+2026-09-11,ZOMATO,-464,Food,expense,bank,False
+2026-09-11,DMART,-960,Groceries,expense,bank,False
+2026-09-12,OLA,-238,Transport,expense,bank,False
+2026-09-12,OLA,-189,Transport,expense,bank,False
+2026-09-13,ZOMATO,-302,Food,expense,bank,False
+2026-09-13,DOMINOS PIZZA,-461,Food,expense,bank,False
+2026-09-13,UBER,-228,Transport,expense,bank,False
+2026-09-13,BOOKMYSHOW,-676,Entertainment,expense,bank,False
+2026-09-15,FLIPKART,-2625,Shopping,expense,bank,False
+2026-09-15,UPI SNEHA RAO,-2400,Other,expense,bank,False
+2026-09-17,BLINKIT,-1478,Groceries,expense,bank,False
+2026-09-18,ZOMATO,-223,Food,expense,bank,False
+2026-09-18,BIGBASKET,-487,Groceries,expense,bank,False
+2026-09-18,MYNTRA,-664,Shopping,expense,bank,False
+2026-09-18,UBER,-359,Transport,expense,bank,False
+2026-09-19,NAMMA METRO,-265,Transport,expense,bank,False
+2026-09-21,CAFE COFFEE DAY,-1081,Food,expense,card,False
+2026-09-22,CAFE COFFEE DAY,-662,Food,expense,bank,False
+2026-09-23,NAMMA METRO,-311,Transport,expense,bank,False
+2026-09-23,OLA,-224,Transport,expense,bank,False
+2026-09-23,NAMMA METRO,-313,Transport,expense,bank,False
+2026-09-23,APOLLO PHARMACY,-584,Healthcare,expense,bank,False
+2026-09-24,BOOKMYSHOW,-812,Entertainment,expense,card,False
+2026-09-25,SWIGGY,-1087,Food,expense,card,False
+2026-09-27,DOMINOS PIZZA,-598,Food,expense,bank,False
+2026-09-27,UBER,-292,Transport,expense,bank,False
+2026-09-28,ZOMATO,-585,Food,expense,bank,False
+2026-09-28,CAFE COFFEE DAY,-599,Food,expense,bank,False
+2026-09-28,CREDIT CARD BILL PAYMENT HDFC,-3884,Transfer,cc_payment,bank,False
