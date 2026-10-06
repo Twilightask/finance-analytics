@@ -6,7 +6,8 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 
-from core.clean import load_all, remove_duplicates, classify, clean_all
+from core.clean import (load_all, remove_duplicates, classify, clean_all,
+                        month_coverage, quality_report)
 
 DIR = ROOT / "data" / "synthetic"
 FILES = [(DIR / "bank_statement.csv", "bank"),
@@ -96,3 +97,32 @@ def test_bank_only_counts_cc_payments_as_spending():
     assert report["unitemized_card_payments"] == 12
     assert (df["txn_type"] == "cc_payment").sum() == 0
     assert round(_net_expenses(df), 2) == 591602  # same total, no double counting
+
+def test_all_12_months_complete():
+    _, r = clean_all(FILES)
+    assert len(r["complete_months"]) == 12 and r["partial_months"] == []
+
+
+def test_baseline_is_last_6_complete_months():
+    _, r = clean_all(FILES)
+    assert r["baseline_months"] == ["2026-04", "2026-05", "2026-06",
+                                    "2026-07", "2026-08", "2026-09"]
+
+
+def test_balance_reconciles_after_cleaning():
+    _, r = clean_all(FILES)
+    assert r["balance_ok"] is True
+
+
+def test_partial_months_detected():
+    df = pd.DataFrame({"date": pd.to_datetime(
+        ["2026-01-15", "2026-02-01", "2026-02-27", "2026-03-10"])})
+    cov = month_coverage(df).set_index("month")["complete"].to_dict()
+    assert cov == {"2026-01": False, "2026-02": True, "2026-03": False}
+
+
+def test_low_confidence_flag():
+    df = pd.DataFrame({"date": pd.to_datetime(["2026-01-01", "2026-02-28"]),
+                       "account_type": ["bank", "bank"],
+                       "amount": [100.0, -50.0], "balance": [100.0, 50.0]})
+    assert quality_report(df)["low_confidence"] is True

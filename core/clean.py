@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-from core.ingest import load_file
+from core.ingest import load_file, reconcile_balance
 
 
 def clean_description(s):
@@ -101,6 +101,34 @@ def match_returns(df, max_days=30):
     return d
 
 
+def month_coverage(df, tol_days=3):
+    """One row per month in the data: is it fully covered (within tol_days)?"""
+    first, last = df["date"].min(), df["date"].max()
+    tol = pd.Timedelta(days=tol_days)
+    rows = []
+    for p in pd.period_range(first, last, freq="M"):
+        start, end = p.start_time, p.end_time.normalize()
+        complete = (first <= start + tol) and (last >= end - tol)
+        rows.append({"month": str(p), "complete": bool(complete)})
+    return pd.DataFrame(rows)
+
+
+def quality_report(df, window=6, min_months=3):
+    cov = month_coverage(df)
+    complete = cov.loc[cov["complete"], "month"].tolist()
+    bank = df[df["account_type"] == "bank"].reset_index(drop=True)
+    balance_ok, bad_rows = reconcile_balance(bank)
+    return {
+        "date_start": str(df["date"].min().date()),
+        "date_end": str(df["date"].max().date()),
+        "complete_months": complete,
+        "partial_months": cov.loc[~cov["complete"], "month"].tolist(),
+        "baseline_months": complete[-window:],
+        "low_confidence": len(complete) < min_months,
+        "balance_ok": balance_ok,
+        "balance_bad_rows": bad_rows,
+    }
+
 def clean_all(files):
     """Full cleaning pipeline. Returns (clean table, report dict)."""
     df, removed = remove_duplicates(load_all(files))
@@ -110,6 +138,7 @@ def clean_all(files):
     report = {"duplicates_removed": removed,
               "unitemized_card_payments": int(df["unitemized_card"].sum()),
               "needs_review": int(df["needs_review"].sum())}
+    report.update(quality_report(df))
     return df, report
 
 if __name__ == "__main__":
@@ -117,8 +146,5 @@ if __name__ == "__main__":
     df, report = clean_all([(d / "bank_statement.csv", "bank"),
                             (d / "bank_statement.xlsx", "bank"),
                             (d / "card_statement.csv", "card")])
-    print(df.groupby("txn_type")["amount"].agg(["count", "sum"]).round(2).to_string())
-    print("matched returns:", int(df["matched_to"].notna().sum()), "of 6")
-    print(report)
-    net = -df.loc[df["txn_type"].isin(["expense", "refund", "reimbursement"]), "amount"].sum()
-    print("net expenses:", round(net, 2))
+    for k, v in report.items():
+        print(f"{k}: {v}")
