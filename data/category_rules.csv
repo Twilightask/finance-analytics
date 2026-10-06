@@ -1,0 +1,133 @@
+keyword,category
+SALARY,Salary
+BONUS,Other Income
+TAX REFUND,Other Income
+RENT,Rent/Housing
+SIP,Investment/Savings
+RD,Investment/Savings
+PPF,Investment/Savings
+FD,Investment/Savings
+MUTUAL FUND,Investment/Savings
+ZERODHA,Investment/Savings
+BROKERAGE,Investment/Savings
+TRANSFER TO OWN,Transfer
+CREDIT CARD BILL,Transfer
+BESCOM,Bills & Utilities
+ELECTRICITY,Bills & Utilities
+AIRTEL,Bills & Utilities
+AIRTEL XSTREAM,Bills & Utilities
+BROADBAND,Bills & Utilities
+JIO,Bills & Utilities
+RECHARGE,Bills & Utilities
+MAHARASHTRA ELECTRICITY,Bills & Utilities
+MAHADISCOM,Bills & Utilities
+MSEDCL,Bills & Utilities
+WATER BILL,Bills & Utilities
+GAS BILL,Bills & Utilities
+INDANE,Bills & Utilities
+BHARAT GAS,Bills & Utilities
+TATA PLAY,Bills & Utilities
+DISH TV,Bills & Utilities
+ACT FIBERNET,Bills & Utilities
+VI POSTPAID,Bills & Utilities
+VODAFONE,Bills & Utilities
+SWIGGY,Food
+ZOMATO,Food
+CAFE COFFEE DAY,Food
+DOMINOS,Food
+CHAI POINT,Food
+BIGBASKET,Groceries
+DMART,Groceries
+D MART,Groceries
+BLINKIT,Groceries
+ZEPTO,Groceries
+SWIGGY INSTAMART,Groceries
+RELIANCE SMART,Groceries
+MORE SUPERMARKET,Groceries
+SPAR HYPERMARKET,Groceries
+STAR BAZAAR,Groceries
+NATURES BASKET,Groceries
+AMAZON,Shopping
+FLIPKART,Shopping
+MYNTRA,Shopping
+CROMA,Shopping
+DECATHLON,Shopping
+RELIANCE DIGITAL,Shopping
+AJIO,Shopping
+TATA CLIQ,Shopping
+MEESHO,Shopping
+NYKAA,Shopping
+FIRSTCRY,Shopping
+UBER,Transport
+OLA,Transport
+RAPIDO,Transport
+NAMMA METRO,Transport
+METRO RAIL,Transport
+BEST BUS,Transport
+MSRTC,Transport
+PETROL,Transport
+HPCL,Transport
+BPCL,Transport
+IOCL,Transport
+FASTAG,Transport
+TOLL PLAZA,Transport
+NETFLIX,Entertainment
+BOOKMYSHOW,Entertainment
+SPOTIFY,Entertainment
+PVR,Entertainment
+INOX,Entertainment
+PRIME VIDEO,Entertainment
+YOUTUBE PREMIUM,Entertainment
+HOTSTAR,Entertainment
+JIOHOTSTAR,Entertainment
+APPLE MUSIC,Entertainment
+APPLE.COM,Entertainment
+STEAM PURCHASE,Entertainment
+APOLLO,Healthcare
+PRACTO,Healthcare
+MEDPLUS,Healthcare
+NETMEDS,Healthcare
+1MG,Healthcare
+TATA 1MG,Healthcare
+FORTIS,Healthcare
+MANIPAL,Healthcare
+MAX HOSPITAL,Healthcare
+PHARMACY,Healthcare
+MAKEMYTRIP,Travel
+IRCTC,Travel
+INDIAN RAILWAYS,Travel
+REDBUS,Travel
+ABHIBUS,Travel
+AIR INDIA,Travel
+INDIGO,Travel
+AKASA AIR,Travel
+LIC PREMIUM,Insurance
+HDFC LIFE,Insurance
+SBI LIFE,Insurance
+ICICI PRUDENTIAL,Insurance
+MAX LIFE,Insurance
+STAR HEALTH,Insurance
+BAJAJ ALLIANZ,Insurance
+HDFC BANK EMI,EMI/Loan
+ICICI BANK EMI,EMI/Loan
+SBI EMI,EMI/Loan
+BAJAJ FINANCE,EMI/Loan
+HOME LOAN,EMI/Loan
+PERSONAL LOAN,EMI/Loan
+LOAN EMI,EMI/Loan
+COLLEGE FEE,Education
+SCHOOL FEE,Education
+UNACADEMY,Education
+UDEMY,Education
+COURSERA,Education
+SKILLSHARE,Education
+ATM CASH,Cash Withdrawal
+CASH WITHDRAWAL,Cash Withdrawal
+ATM WDL,Cash Withdrawal
+SERVICE CHARGE,Fees & Charges
+BANK CHARGE,Fees & Charges
+ATM CHARGE,Fees & Charges
+GST CHARGE,Fees & Charges
+MINIMUM BALANCE,Fees & Charges
+LATE FEE,Fees & Charges
+PENALTY,Fees & Charges
