@@ -6,17 +6,24 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
+from datetime import date, timedelta
+
+import pandas as pd
 import streamlit as st
 
-from core.categorize import categorize, coverage, load_rules, load_user_rules
+from core.categorize import (categorize, correct_category, coverage,
+                             load_rules, load_user_rules)
 from core.clean import clean_all
+from core.db import load_goal, load_transactions, save_goal, save_transactions
+from core.goals import (NOT_SPENDING, emergency_fund_goal, evaluate_goal,
+                        gap_drivers, monthly_category_spend, simulate)
 import plotly.express as px
 
-from core.analytics import (baseline, category_spending, essential_split,
+from core.analytics import (ESSENTIAL, baseline, category_spending, essential_split,
                             find_anomalies, month_over_month, monthly_summary,
                             overview, recurring_payments, top_merchants)
 from core.clean import quality_report
-from core.db import load_transactions, save_transactions
+
 
 DEMO = ROOT / "data" / "synthetic"
 DEMO_FILES = [(DEMO / "bank_statement.csv", "bank"),
@@ -184,7 +191,192 @@ def page_overview():
     with st.expander("Unusually large expenses"):
         st.dataframe(find_anomalies(df), use_container_width=True)
 
-PAGES = {"Upload & Preview": page_upload, "Financial Overview": page_overview}
+CATEGORIES = ["Food", "Groceries", "Shopping", "Transport", "Bills & Utilities",
+              "Entertainment", "Healthcare", "Education", "Rent/Housing", "Travel",
+              "EMI/Loan", "Insurance", "Fees & Charges", "Cash Withdrawal",
+              "Investment/Savings", "Salary", "Other Income", "Transfer", "Other"]
+
+
+def fmt(x):
+    return rupees(x) if x is not None else "n/a"
+
+
+def init_goal_state():
+    if "g_name" in st.session_state:
+        return
+    g = load_goal()
+    if g:
+        st.session_state["g_name"] = g["name"]
+        st.session_state["g_target"] = float(g["target_amount"])
+        st.session_state["g_date"] = pd.Timestamp(g["target_date"]).date()
+        st.session_state["g_saved"] = float(g["already_saved"])
+    else:
+        st.session_state["g_name"] = "My Goal"
+        st.session_state["g_target"] = 100000.0
+        st.session_state["g_date"] = date.today() + timedelta(days=240)
+        st.session_state["g_saved"] = 0.0
+
+
+def show_status(r):
+    box = {"on_track": st.success, "close": st.warning, "off_track": st.error}.get(r["status"], st.info)
+    box(r["message"])
+    for w in r["warnings"]:
+        st.warning(w)
+
+
+def page_goal():
+    st.title("Goal & What-If")
+    df = get_data()
+    if df is None:
+        st.info("No data yet. Go to Upload & Preview first.")
+        return
+    months, low = baseline_info(df)
+    if not months:
+        st.error("No complete months found, so a goal cannot be evaluated.")
+        return
+    b = baseline(df, months)
+    init_goal_state()
+
+    st.subheader("Your goal")
+    st.caption("The app tracks one active goal, because monthly savings cannot be "
+               "split across several goals reliably.")
+    if st.button("Use emergency-fund template (6 x essential monthly spending)"):
+        sp = essential_split(df, months)
+        st.session_state["g_name"] = "Emergency Fund"
+        st.session_state["g_target"] = emergency_fund_goal(
+            sp["essential_monthly"], date.today())["target_amount"]
+    c1, c2, c3, c4 = st.columns(4)
+    c1.text_input("Goal name", key="g_name")
+    c2.number_input("Target amount (₹)", min_value=0.0, step=1000.0, key="g_target")
+    c3.date_input("Target date", key="g_date")
+    c4.number_input("Already saved for this goal (₹)", min_value=0.0, step=1000.0, key="g_saved")
+    st.caption("Statements cannot show how much you saved for a specific goal, so enter it yourself.")
+
+    goal = {"name": st.session_state["g_name"], "target_amount": st.session_state["g_target"],
+            "target_date": st.session_state["g_date"].isoformat(),
+            "already_saved": st.session_state["g_saved"]}
+    if st.button("Save goal"):
+        save_goal(goal)
+        st.success("Goal saved.")
+
+    today = date.today()
+    r = evaluate_goal(goal, b["savings_mean"], today, low)
+    show_status(r)
+    if goal["target_amount"] > 0:
+        st.progress(min(goal["already_saved"] / goal["target_amount"], 1.0),
+                    text=f"Saved so far: {rupees(goal['already_saved'])} of {rupees(goal['target_amount'])}")
+
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Remaining", rupees(r["remaining"]))
+    m2.metric("Months left", r["months_left"] if r["months_left"] is not None else "n/a")
+    m3.metric("Required per month", fmt(r["required_monthly"]))
+    m4.metric("You save per month", rupees(r["current_monthly_saving"]),
+              f"median {rupees(b['savings_median'])}", delta_color="off")
+    if r["gap"] is not None:
+        label = "Shortfall per month" if r["gap"] > 0 else "Surplus per month"
+        st.metric(label, rupees(abs(r["gap"])))
+    if r["months_needed_at_current_pace"]:
+        st.caption(f"At your current pace this would take about "
+                   f"{r['months_needed_at_current_pace']} months.")
+    if r["gap"] is not None and r["gap"] > 0:
+        drivers = gap_drivers(df, months)
+        if drivers:
+            st.write("Biggest discretionary categories (monthly average): " +
+                     ", ".join(f"**{k}** {rupees(v)}" for k, v in drivers.items()))
+
+    st.subheader("What-if simulator")
+    st.caption("Assumes any money you cut is actually saved, not spent elsewhere.")
+    spend = monthly_category_spend(df, months)
+    usable = [c for c, v in spend.items() if v > 0 and c not in NOT_SPENDING]
+    cuts = {}
+    for cat in [c for c in usable if c not in ESSENTIAL]:
+        cuts[cat] = st.slider(f"Reduce {cat} by % (now {rupees(spend[cat])}/month)",
+                              0, 100, 0, 5, key=f"cut_{cat}")
+    with st.expander("Essential categories"):
+        for cat in [c for c in usable if c in ESSENTIAL]:
+            cuts[cat] = st.slider(f"Reduce {cat} by % (now {rupees(spend[cat])}/month)",
+                                  0, 100, 0, 5, key=f"cut_{cat}")
+    extra = st.number_input("Extra monthly saving (₹)", min_value=0.0, step=500.0)
+    new_deadline = None
+    if st.checkbox("Try a different deadline"):
+        new_deadline = st.date_input("New deadline", value=goal_default(goal), key="new_deadline").isoformat()
+
+    s = simulate(goal, b["savings_mean"], spend, today, low,
+                 cuts={c: p for c, p in cuts.items() if p > 0},
+                 extra_saving=extra, new_deadline=new_deadline)
+    cur, sc = s["current"], s["scenario"]
+    left, right = st.columns(2)
+    left.write("**Current**")
+    left.metric("Saving per month", rupees(cur["current_monthly_saving"]))
+    left.metric("Required per month", fmt(cur["required_monthly"]))
+    left.write(f"Status: **{cur['status']}**")
+    right.write("**Scenario**")
+    right.metric("Saving per month", rupees(sc["current_monthly_saving"]),
+                 f"+{rupees(s['monthly_improvement'])}")
+    right.metric("Required per month", fmt(sc["required_monthly"]))
+    right.write(f"Status: **{sc['status']}**")
+    show_status(sc)
+
+    cmp = pd.DataFrame({"Case": ["Current", "Scenario"],
+                        "Monthly saving": [cur["current_monthly_saving"], sc["current_monthly_saving"]]})
+    fig = px.bar(cmp, x="Case", y="Monthly saving", title="Monthly saving vs requirement")
+    if sc["required_monthly"] is not None:
+        fig.add_hline(y=sc["required_monthly"], line_dash="dash",
+                      annotation_text="Required (scenario)")
+    st.plotly_chart(fig, use_container_width=True)
+
+
+def goal_default(goal):
+    return pd.Timestamp(goal["target_date"]).date() + timedelta(days=90)
+
+
+def page_transactions():
+    st.title("Transactions & Category Corrections")
+    df = get_data()
+    if df is None:
+        st.info("No data yet. Go to Upload & Preview first.")
+        return
+    if "flash" in st.session_state:
+        st.success(st.session_state.pop("flash"))
+
+    f1, f2, f3, f4 = st.columns(4)
+    cat = f1.selectbox("Category", ["All"] + sorted(df["category"].unique()))
+    typ = f2.selectbox("Type", ["All"] + sorted(df["txn_type"].unique()))
+    text = f3.text_input("Search description")
+    only_review = f4.checkbox("Needs review only")
+    v = df
+    if cat != "All":
+        v = v[v["category"] == cat]
+    if typ != "All":
+        v = v[v["txn_type"] == typ]
+    if text:
+        v = v[v["description_clean"].str.contains(text.upper(), regex=False)]
+    if only_review:
+        v = v[v["needs_review"]]
+    st.write(f"{len(v)} transactions")
+
+    st.subheader("Correct a category")
+    if len(v) == 0:
+        st.info("No transactions match the filters.")
+    else:
+        shown = v.head(300)
+        names = dict(zip(shown["txn_id"], shown["description_clean"] + "  |  " + shown["amount"].map("{:,.0f}".format)))
+        tid = st.selectbox("Transaction", list(names), format_func=lambda i: f"{i}  |  {names[i]}")
+        new_cat = st.selectbox("New category", CATEGORIES)
+        whole = st.checkbox("Apply to every transaction from this merchant "
+                            "(also saved as a rule for future uploads)", value=True)
+        if st.button("Apply correction"):
+            fixed = correct_category(df, tid, new_cat, apply_to_merchant=whole)
+            save_transactions(fixed)
+            st.session_state["df"] = fixed
+            st.session_state["flash"] = f"Category changed to {new_cat}."
+            st.rerun()
+
+    st.dataframe(v[["txn_id", "date", "description", "amount", "txn_type",
+                    "category", "category_source"]].head(300), use_container_width=True)
+
+PAGES = {"Upload & Preview": page_upload, "Financial Overview": page_overview,
+         "Goal & What-If": page_goal, "Transactions": page_transactions}
 
 page = st.sidebar.radio("Go to", list(PAGES))
 PAGES[page]()
