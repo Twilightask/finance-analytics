@@ -15,8 +15,10 @@ def read_raw(path):
     if not path.exists():
         raise ValueError(f"File not found: {path.name}")
     ext = path.suffix.lower()
-    if ext not in (".csv", ".xlsx", ".xls"):
-        raise ValueError(f"Unsupported file type '{ext}'. Please upload CSV or XLSX.")
+    if ext not in (".csv", ".xlsx", ".xls", ".pdf"):
+        raise ValueError(f"Unsupported file type '{ext}'. Please upload CSV, XLSX or PDF.")
+    if ext == ".pdf":
+        return read_pdf_raw(path)
     try:
         if ext == ".csv":
             raw = pd.read_csv(path, header=None, dtype=str, encoding="utf-8-sig")
@@ -30,6 +32,45 @@ def read_raw(path):
         raise ValueError(f"{path.name} has no data.")
     return raw
 
+def read_pdf_raw(path):
+    """Extract the transaction table from a text-based PDF (no OCR)."""
+    import pdfplumber
+    from pdfminer.pdfdocument import PDFPasswordIncorrect
+
+    rows, has_text, header_seen = [], False, False
+    try:
+        with pdfplumber.open(path) as pdf:
+            for page in pdf.pages:
+                has_text = has_text or bool((page.extract_text() or "").strip())
+                for table in page.extract_tables():
+                    for row in table:
+                        cells = [None if c is None else c.replace("\n", " ").strip() for c in row]
+                        if not any(cells):
+                            continue
+                        is_header = sum(any(w in c.lower() for w in HEADER_WORDS)
+                                        for c in cells if c) >= 3
+                        if is_header and header_seen:
+                            continue                      # repeated header on later pages
+                        header_seen = header_seen or is_header
+                        rows.append(cells)
+    except Exception as e:
+        inner = e.args[0] if e.args else None
+        names = {type(e).__name__, type(inner).__name__}
+        if (isinstance(inner, PDFPasswordIncorrect) or isinstance(e, PDFPasswordIncorrect)
+                or "password" in str(e).lower() or "password" in str(inner).lower()
+                or names & {"PDFPasswordIncorrect", "PasswordError"}
+                or type(e).__name__ == "PdfminerException"):
+            raise ValueError(f"{Path(path).name} is password-protected or cannot be opened. "
+                             "Remove the password or download a CSV/XLSX statement instead.")
+        raise ValueError(f"Could not read {Path(path).name} as a PDF: {type(e).__name__} {e}")
+
+    if not has_text:
+        raise ValueError(f"{Path(path).name} looks like a scanned image. Scanned PDFs are "
+                         "not supported. Please use a CSV/XLSX statement.")
+    if not rows:
+        raise ValueError(f"No transaction table found in {Path(path).name}. This PDF layout "
+                         "is not supported. Please use a CSV/XLSX statement.")
+    return pd.DataFrame(rows)
 
 def find_header_row(raw, max_scan=30):
     """Return the index of the first row that looks like column names."""

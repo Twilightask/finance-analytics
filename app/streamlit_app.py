@@ -63,7 +63,7 @@ def page_upload():
         except ValueError as e:
             st.error(str(e))
 
-    uploads = st.file_uploader("Statement files", type=["csv", "xlsx"],
+    uploads = st.file_uploader("Statement files", type=["csv", "xlsx", "pdf"],
                                accept_multiple_files=True)
     kinds = {}
     for f in uploads:

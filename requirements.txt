@@ -4,3 +4,5 @@ openpyxl
 pytest
 streamlit
 plotly
+pdfplumber
+reportlab
