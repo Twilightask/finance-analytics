@@ -6,7 +6,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 
-from core.clean import load_all, remove_duplicates
+from core.clean import load_all, remove_duplicates, classify
 
 DIR = ROOT / "data" / "synthetic"
 FILES = [(DIR / "bank_statement.csv", "bank"),
@@ -44,3 +44,24 @@ def test_bank_total_matches_truth():
     truth = pd.read_csv(DIR / "truth_transactions.csv")
     got = df[df.account_type == "bank"]["amount"].sum()
     assert round(got, 2) == round(truth[truth.account == "bank"]["amount"].sum(), 2)
+
+def _classified():
+    df, _ = remove_duplicates(load_all(FILES))
+    return classify(df)
+
+
+def test_types_match_truth():
+    got = _classified().groupby("txn_type")["amount"].agg(["count", "sum"]).round(2)
+    truth = pd.read_csv(DIR / "truth_transactions.csv")
+    exp = truth.groupby("txn_type")["amount"].agg(["count", "sum"]).round(2)
+    pd.testing.assert_frame_equal(got, exp, check_dtype=False)
+
+
+def test_nothing_needs_review():
+    assert not _classified()["needs_review"].any()
+
+
+def test_one_time_income_flagged():
+    df = _classified()
+    assert df["one_time"].sum() == 2
+    assert df.loc[df.one_time, "amount"].sum() == 38000
