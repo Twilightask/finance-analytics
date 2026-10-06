@@ -99,6 +99,27 @@ def emergency_fund_goal(essential_monthly, target_date, multiple=6, already_save
             "target_amount": round(multiple * essential_monthly, 2),
             "target_date": target_date, "already_saved": already_saved}
 
+def simulate(goal, monthly_savings, category_spend, today=None, low_confidence=False,
+             cuts=None, extra_saving=0.0, new_deadline=None):
+    """cuts = {"Shopping": 20} means cut Shopping by 20%. Returns current vs scenario."""
+    cuts = cuts or {}
+    for cat, pct in cuts.items():
+        if not 0 <= pct <= 100:
+            raise ValueError(f"Cut for {cat} must be between 0 and 100.")
+        if cat not in category_spend:
+            raise ValueError(f"No spending found for category '{cat}'.")
+    if extra_saving < 0:
+        raise ValueError("Extra saving cannot be negative.")
+
+    freed = sum(category_spend[c] * p / 100 for c, p in cuts.items())
+    new_savings = float(monthly_savings) + freed + float(extra_saving)
+
+    current = evaluate_goal(goal, monthly_savings, today, low_confidence)
+    scenario_goal = dict(goal, target_date=new_deadline or goal["target_date"])
+    scenario = evaluate_goal(scenario_goal, new_savings, today, low_confidence)
+    return {"current": current, "scenario": scenario,
+            "monthly_improvement": round(freed + float(extra_saving), 2),
+            "status_changed": current["status"] != scenario["status"]}
 
 if __name__ == "__main__":
     from pathlib import Path
@@ -120,3 +141,12 @@ if __name__ == "__main__":
     for k, v in r.items():
         print(f"{k}: {v}")
     print("drivers:", gap_drivers(df, report["baseline_months"]))
+
+
+    spend = monthly_category_spend(df, report["baseline_months"])
+    s = simulate(goal, b["savings_mean"], spend, today="2026-10-06",
+                 cuts={"Shopping": 20}, extra_saving=500)
+    print("\nWHAT-IF: Shopping -20% and +500/month")
+    print("improvement:", s["monthly_improvement"])
+    print("current :", s["current"]["status"], s["current"]["current_monthly_saving"])
+    print("scenario:", s["scenario"]["status"], s["scenario"]["current_monthly_saving"])

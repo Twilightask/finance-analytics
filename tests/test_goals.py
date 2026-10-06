@@ -6,8 +6,10 @@ ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(ROOT))
 
 import pandas as pd
+import pytest
 
-from core.goals import emergency_fund_goal, evaluate_goal, gap_drivers, months_until
+from core.goals import (emergency_fund_goal, evaluate_goal, gap_drivers,
+                        months_until, simulate)
 
 TODAY = date(2026, 10, 6)
 GOAL = {"name": "Japan Trip", "target_amount": 120000,
@@ -72,3 +74,42 @@ def test_gap_drivers_only_discretionary():
 def test_emergency_fund_goal():
     g = emergency_fund_goal(30000, "2027-12-31", multiple=6)
     assert g["target_amount"] == 180000 and g["name"] == "Emergency Fund"
+
+SPEND = {"Shopping": 5000.0, "Food": 4000.0}
+
+
+def test_brief_example_shopping_cut():
+    # 11,800 saved, Shopping 7,000/month cut 20% -> +1,400 -> 13,200 >= 12,500
+    s = simulate(GOAL, 11800, {"Shopping": 7000.0}, TODAY, cuts={"Shopping": 20})
+    assert s["scenario"]["current_monthly_saving"] == 13200
+    assert s["current"]["status"] == "close"
+    assert s["scenario"]["status"] == "on_track" and s["status_changed"]
+
+
+def test_extra_saving_and_improvement():
+    s = simulate(GOAL, 10000, SPEND, TODAY, cuts={"Food": 50}, extra_saving=500)
+    assert s["monthly_improvement"] == 2500
+    assert s["scenario"]["current_monthly_saving"] == 12500
+    assert s["scenario"]["status"] == "on_track"
+
+
+def test_new_deadline_lowers_requirement():
+    s = simulate(GOAL, 9000, SPEND, TODAY, new_deadline="2027-10-06")
+    assert s["current"]["required_monthly"] == 12500
+    assert s["scenario"]["months_left"] == 12
+    assert s["scenario"]["required_monthly"] == pytest.approx(8333.33, abs=0.01)
+    assert s["scenario"]["status"] == "on_track"
+
+
+def test_no_changes_means_same_result():
+    s = simulate(GOAL, 11800, SPEND, TODAY)
+    assert s["monthly_improvement"] == 0 and not s["status_changed"]
+
+
+def test_invalid_inputs_rejected():
+    with pytest.raises(ValueError):
+        simulate(GOAL, 11800, SPEND, TODAY, cuts={"Shopping": 120})
+    with pytest.raises(ValueError):
+        simulate(GOAL, 11800, SPEND, TODAY, cuts={"Travel": 10})
+    with pytest.raises(ValueError):
+        simulate(GOAL, 11800, SPEND, TODAY, extra_saving=-5)
