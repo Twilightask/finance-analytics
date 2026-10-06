@@ -9,7 +9,8 @@ import pandas as pd
 import pytest
 
 from core.analytics import (baseline, category_spending, month_over_month,
-                            monthly_summary, overview, top_merchants)
+                            monthly_summary, overview, top_merchants,
+                            recurring_payments, find_anomalies, essential_split)
 from core.categorize import categorize, load_rules
 from core.clean import clean_all
 
@@ -80,3 +81,28 @@ def test_month_without_income_has_no_rate():
                        "amount": [-100.0], "one_time": [False]})
     m = monthly_summary(df)
     assert m.loc["2026-01", "expenses"] == 100 and pd.isna(m.loc["2026-01", "savings_rate"])
+
+def test_recurring_finds_fixed_payments():
+    r = recurring_payments(_df()).set_index("merchant")
+    assert r.loc["RENT TO LANDLORD", "typical_amount"] == 18000
+    assert r.loc["RENT TO LANDLORD", "months"] == 12
+    assert "AIRTEL BROADBAND" in r.index and "JIO MOBILE RECHARGE" in r.index
+    assert "BESCOM ELECTRICITY" not in r.index
+    assert "SWIGGY" not in r.index
+
+
+def test_laptop_is_anomaly():
+    a = find_anomalies(_df())
+    assert "CROMA LAPTOP" in a["description_clean"].tolist()
+
+
+def test_anomaly_skips_small_categories():
+    a = find_anomalies(_df())
+    assert "MAKEMYTRIP GOA TRIP" not in a["description_clean"].tolist()
+
+
+def test_essential_split_math():
+    s = essential_split(_df(), BASELINE)
+    assert s["essential_monthly"] >= 19000
+    assert s["emergency_fund_3x"] == pytest.approx(3 * s["essential_monthly"], abs=0.01)
+    assert s["emergency_fund_6x"] == pytest.approx(6 * s["essential_monthly"], abs=0.01)

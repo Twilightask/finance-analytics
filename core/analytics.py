@@ -90,6 +90,51 @@ def month_over_month(monthly):
     change = monthly["expenses"].pct_change(fill_method=None) * 100
     return change.replace([np.inf, -np.inf], np.nan).round(1)
 
+ESSENTIAL = ["Rent/Housing", "Bills & Utilities", "Groceries", "Healthcare",
+             "Transport", "Insurance", "EMI/Loan", "Education"]
+
+
+def recurring_payments(df, min_months=3, tol=0.10):
+    e = df[df["txn_type"] == "expense"].copy()
+    e["month"] = _month(e)
+    rows = []
+    for merchant, g in e.groupby("description_clean"):
+        if g["month"].nunique() < min_months:
+            continue
+        med = g["amount"].median()
+        if (g["amount"].sub(med).abs() <= abs(med) * tol).all():
+            rows.append({"merchant": merchant, "months": g["month"].nunique(),
+                         "typical_amount": round(-med, 2)})
+    out = pd.DataFrame(rows, columns=["merchant", "months", "typical_amount"])
+    return out.sort_values("typical_amount", ascending=False).reset_index(drop=True)
+
+
+def find_anomalies(df, min_n=8, k=1.5):
+    e = df[df["txn_type"] == "expense"].copy()
+    e["spend"] = -e["amount"]
+    flagged = []
+    for cat, g in e.groupby("category"):
+        if len(g) < min_n:
+            continue
+        q1, q3 = g["spend"].quantile([0.25, 0.75])
+        limit = q3 + k * (q3 - q1)
+        flagged.append(g[g["spend"] > limit])
+    if not flagged:
+        return e.iloc[0:0][["date", "description_clean", "category", "spend"]]
+    out = pd.concat(flagged)[["date", "description_clean", "category", "spend"]]
+    return out.sort_values("spend", ascending=False).reset_index(drop=True)
+
+
+def essential_split(df, months):
+    """Average monthly essential vs discretionary spend over the given months."""
+    s = spend_rows(df)
+    s = s[s["month"].isin(months)]
+    s = s[~s["category"].isin(["Investment/Savings", "Transfer"])]
+    ess = s.loc[s["category"].isin(ESSENTIAL), "spend"].sum() / len(months)
+    dis = s.loc[~s["category"].isin(ESSENTIAL), "spend"].sum() / len(months)
+    return {"essential_monthly": round(ess, 2), "discretionary_monthly": round(dis, 2),
+            "emergency_fund_3x": round(3 * ess, 2), "emergency_fund_6x": round(6 * ess, 2)}
+
 
 if __name__ == "__main__":
     from pathlib import Path
@@ -112,3 +157,9 @@ if __name__ == "__main__":
     print(category_spending(df).head(5).to_string())
     print()
     print(top_merchants(df, 3).to_string())
+    print()
+    print(recurring_payments(df).to_string())
+    print()
+    print(find_anomalies(df).head(5).to_string())
+    print()
+    print(essential_split(df, report["baseline_months"]))
