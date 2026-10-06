@@ -1,4 +1,5 @@
 """Stage 7: Streamlit UI. Displays results only; all logic lives in core/."""
+import os
 import sys
 import tempfile
 from pathlib import Path
@@ -33,20 +34,22 @@ DEMO_FILES = [(DEMO / "bank_statement.csv", "bank"),
               (DEMO / "card_statement.csv", "card")]
 
 st.set_page_config(page_title="Goal-Based Finance Analytics", layout="wide")
+DEMO_MODE = os.environ.get("DEMO_MODE") == "1"
 
 
 def run_pipeline(files):
     """files = list of (path, account_type). Stores results in session_state + SQLite."""
     df, report = clean_all(files)
     df = categorize(df, load_rules(), load_user_rules())
-    save_transactions(df)
+    if not DEMO_MODE:
+        save_transactions(df)
     st.session_state["df"] = df
     st.session_state["report"] = report
 
 
 def get_data():
     """Current table: from this session, else from SQLite, else None."""
-    if "df" not in st.session_state:
+    if "df" not in st.session_state and not DEMO_MODE:
         saved = load_transactions()
         if saved is not None:
             st.session_state["df"] = saved
@@ -65,8 +68,13 @@ def page_upload():
         except ValueError as e:
             st.error(str(e))
 
-    uploads = st.file_uploader("Statement files", type=["csv", "xlsx", "pdf"],
-                               accept_multiple_files=True)
+    if DEMO_MODE:
+        st.info("Public demo: uploads are disabled and only synthetic data is used. "
+                "Run the app locally to analyse your own statements.")
+        uploads = []
+    else:
+        uploads = st.file_uploader("Statement files", type=["csv", "xlsx", "pdf"],
+                                   accept_multiple_files=True)
     kinds = {}
     for f in uploads:
         kinds[f.name] = st.radio(f"{f.name} is a", ["bank", "card"],
@@ -206,7 +214,7 @@ def fmt(x):
 def init_goal_state():
     if "g_name" in st.session_state:
         return
-    g = load_goal()
+    g = None if DEMO_MODE else load_goal()
     if g:
         st.session_state["g_name"] = g["name"]
         st.session_state["g_target"] = float(g["target_amount"])
@@ -257,7 +265,7 @@ def page_goal():
     goal = {"name": st.session_state["g_name"], "target_amount": st.session_state["g_target"],
             "target_date": st.session_state["g_date"].isoformat(),
             "already_saved": st.session_state["g_saved"]}
-    if st.button("Save goal"):
+    if not DEMO_MODE and st.button("Save goal"):
         save_goal(goal)
         st.success("Goal saved.")
 
@@ -366,10 +374,11 @@ def page_transactions():
         tid = st.selectbox("Transaction", list(names), format_func=lambda i: f"{i}  |  {names[i]}")
         new_cat = st.selectbox("New category", CATEGORIES)
         whole = st.checkbox("Apply to every transaction from this merchant "
-                            "(also saved as a rule for future uploads)", value=True)
+                            "(also saved as a rule for future uploads)", value=not DEMO_MODE, disabled=DEMO_MODE)
         if st.button("Apply correction"):
             fixed = correct_category(df, tid, new_cat, apply_to_merchant=whole)
-            save_transactions(fixed)
+            if not DEMO_MODE:
+                save_transactions(fixed)
             st.session_state["df"] = fixed
             st.session_state["flash"] = f"Category changed to {new_cat}."
             st.rerun()
@@ -414,6 +423,9 @@ def page_assistant():
 PAGES = {"Upload & Preview": page_upload, "Financial Overview": page_overview,
          "Goal & What-If": page_goal, "Transactions": page_transactions,
          "AI Assistant": page_assistant}
+
+if DEMO_MODE:
+    PAGES.pop("AI Assistant")
 
 page = st.sidebar.radio("Go to", list(PAGES))
 PAGES[page]()
