@@ -5,3 +5,4 @@ __pycache__/
 .pytest_cache/
 data/real/
 .vscode/
+data/user_rules.csv
