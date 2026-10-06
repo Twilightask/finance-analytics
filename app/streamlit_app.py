@@ -24,6 +24,8 @@ from core.analytics import (ESSENTIAL, baseline, category_spending, essential_sp
                             overview, recurring_payments, top_merchants)
 from core.clean import quality_report
 
+from ai.assistant import QUESTIONS, explain
+
 
 DEMO = ROOT / "data" / "synthetic"
 DEMO_FILES = [(DEMO / "bank_statement.csv", "bank"),
@@ -375,8 +377,43 @@ def page_transactions():
     st.dataframe(v[["txn_id", "date", "description", "amount", "txn_type",
                     "category", "category_source"]].head(300), use_container_width=True)
 
+def page_assistant():
+    st.title("AI Assistant")
+    st.caption("Pick a question. Numbers always come from the verified calculations. "
+               "The AI only rewords them, and any answer with an unverified number is discarded.")
+    df = get_data()
+    if df is None:
+        st.info("No data yet. Go to Upload & Preview first.")
+        return
+    months, low = baseline_info(df)
+    if not months:
+        st.error("No complete months found.")
+        return
+    init_goal_state()
+    goal = {"name": st.session_state["g_name"], "target_amount": st.session_state["g_target"],
+            "target_date": st.session_state["g_date"].isoformat(),
+            "already_saved": st.session_state["g_saved"]}
+    ctx = {"df": df, "months": months, "low": low, "goal": goal, "today": date.today()}
+
+    use_ai = st.toggle("Use local AI (Ollama) to reword the answer", value=False)
+    label = st.selectbox("Question", list(QUESTIONS))
+    if st.button("Answer"):
+        with st.spinner("Working..."):
+            res = explain(QUESTIONS[label], ctx, use_ai=use_ai)
+        st.session_state["answer"] = res
+    res = st.session_state.get("answer")
+    if res:
+        st.write(res["text"])
+        if res["source"] == "ai":
+            st.caption("Reworded by a local AI. Every number was checked against the verified facts.")
+        else:
+            st.caption("Shown as verified facts (no AI used).")
+        if res["note"]:
+            st.info(res["note"])
+
 PAGES = {"Upload & Preview": page_upload, "Financial Overview": page_overview,
-         "Goal & What-If": page_goal, "Transactions": page_transactions}
+         "Goal & What-If": page_goal, "Transactions": page_transactions,
+         "AI Assistant": page_assistant}
 
 page = st.sidebar.radio("Go to", list(PAGES))
 PAGES[page]()
