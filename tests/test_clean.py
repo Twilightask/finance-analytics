@@ -6,7 +6,7 @@ sys.path.insert(0, str(ROOT))
 
 import pandas as pd
 
-from core.clean import load_all, remove_duplicates, classify
+from core.clean import load_all, remove_duplicates, classify, clean_all
 
 DIR = ROOT / "data" / "synthetic"
 FILES = [(DIR / "bank_statement.csv", "bank"),
@@ -65,3 +65,34 @@ def test_one_time_income_flagged():
     df = _classified()
     assert df["one_time"].sum() == 2
     assert df.loc[df.one_time, "amount"].sum() == 38000
+
+def _net_expenses(df):
+    return -df.loc[df["txn_type"].isin(["expense", "refund", "reimbursement"]), "amount"].sum()
+
+
+def test_net_expenses_match_truth():
+    df, _ = clean_all(FILES)
+    assert round(_net_expenses(df), 2) == 591602
+
+
+def test_returns_matched_to_right_purchase():
+    df, _ = clean_all(FILES)
+    by_id = df.set_index("txn_id")
+    rets = df[df["txn_type"] == "refund"]
+    assert len(rets) == 3 and rets["matched_to"].notna().all()
+    for _, r in rets.iterrows():
+        assert by_id.loc[r["matched_to"], "description_clean"] == r["description_clean"].removeprefix("REFUND ")
+    assert df.loc[df["txn_type"] == "reimbursement", "matched_to"].notna().all()
+
+
+def test_cc_payments_excluded_when_card_present():
+    df, report = clean_all(FILES)
+    assert (df["txn_type"] == "cc_payment").sum() == 12
+    assert report["unitemized_card_payments"] == 0
+
+
+def test_bank_only_counts_cc_payments_as_spending():
+    df, report = clean_all(FILES[:2])             # no card statement uploaded
+    assert report["unitemized_card_payments"] == 12
+    assert (df["txn_type"] == "cc_payment").sum() == 0
+    assert round(_net_expenses(df), 2) == 591602  # same total, no double counting
