@@ -101,7 +101,8 @@ def page_upload():
     rep = st.session_state.get("report")
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Transactions", len(df))
-    c2.metric("Date range", f"{df['date'].min():%d %b %Y} to {df['date'].max():%d %b %Y}")
+    c2.caption("Date range")
+    c2.markdown(f"**{df['date'].min():%d %b %Y} to {df['date'].max():%d %b %Y}**")
     c3.metric("Categorized by rules", f"{coverage(df)}%")
     c4.metric("Needs review", int(df["needs_review"].sum()))
 
@@ -302,6 +303,13 @@ def goal_summary(r):
     return text + f"That is **{rupees(-r['gap'])} more** than needed."
 
 
+def goal_date(today, months):
+    """Month the goal is reached if you keep saving at a given pace (display only)."""
+    if not months:
+        return "not at this pace"
+    return (pd.Timestamp(today) + pd.DateOffset(months=int(months))).strftime("%b %Y")
+
+
 def page_goal():
     st.title("Goal & What-If")
     df = get_data()
@@ -363,9 +371,25 @@ def page_goal():
               f"median {rupees(b['savings_median'])}", delta_color="off",
               help="Average cash savings over your recent complete months (income minus spending, "
                    "investments not counted). The median is the middle month.")
-    if r["months_needed_at_current_pace"]:
-        st.caption(f"At your current pace this goal would take about "
-                   f"{r['months_needed_at_current_pace']} months.")
+    n = r["months_needed_at_current_pace"]
+    if n:
+        deadline = pd.Timestamp(goal["target_date"]).strftime("%b %Y")
+        st.markdown(f"**Estimated finish:** around **{goal_date(today, n)}** "
+                    f"at your current pace (your deadline: {deadline}).")
+
+    st.markdown("**How reliable is this?** Your savings change from month to month, "
+                "so here is the goal in your best, typical and worst recent month:")
+    monthly = monthly_summary(df).loc[months, "savings"]
+    rows = []
+    for label, val in [("Best month", monthly.max()),
+                       ("Typical month (median)", monthly.median()),
+                       ("Worst month", monthly.min())]:
+        x = evaluate_goal(goal, val, today, low)
+        rows.append({"If you save like your...": label,
+                     "Saving / month": rupees(val),
+                     "Result": STATUS_TEXT.get(x["status"], x["status"]),
+                     "Goal reached around": goal_date(today, x["months_needed_at_current_pace"])})
+    st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
     if r["gap"] is not None and r["gap"] > 0:
         drivers = gap_drivers(df, months)
         if drivers:
@@ -516,3 +540,6 @@ if DEMO_MODE:
 
 page = st.sidebar.radio("Go to", list(PAGES))
 PAGES[page]()
+
+st.divider()
+st.caption("Credits: Aayush Kumbhar")
