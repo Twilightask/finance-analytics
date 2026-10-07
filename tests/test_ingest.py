@@ -62,3 +62,11 @@ def test_bad_inputs_fail_clearly(tmp_path):
     pdf.write_text("hi")
     with pytest.raises(ValueError):
         load_file(pdf)
+
+def test_opening_balance_row_dropped(tmp_path):
+    p = tmp_path / "s.csv"
+    p.write_text("Date,Narration,Amount,Balance\n"
+                 "01/07/2026,OPENING BALANCE,0,50000\n"
+                 "02/07/2026,SWIGGY,-200,49800\n")
+    df = load_file(p)
+    assert len(df) == 1 and df["description"].iloc[0] == "SWIGGY"

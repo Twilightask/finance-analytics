@@ -126,3 +126,13 @@ def test_low_confidence_flag():
                        "account_type": ["bank", "bank"],
                        "amount": [100.0, -50.0], "balance": [100.0, 50.0]})
     assert quality_report(df)["low_confidence"] is True
+
+def test_unmatched_reimbursement_not_flagged_but_unmatched_refund_is():
+    from core.clean import match_returns
+    df = pd.DataFrame({
+        "txn_id": [1, 2], "date": pd.to_datetime(["2026-01-10", "2026-01-11"]),
+        "description_clean": ["UPI/FRIEND/ROHAN REIMBURSEMENT", "REFUND AMAZON"],
+        "amount": [800.0, 500.0], "txn_type": ["reimbursement", "refund"],
+        "account_type": ["bank", "bank"], "needs_review": [False, False]})
+    out = match_returns(df)
+    assert out["needs_review"].tolist() == [False, True]

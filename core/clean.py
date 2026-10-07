@@ -47,7 +47,7 @@ def classify(df):
     conditions = [
         pos & s.str.contains(r"SALARY|BONUS|TAX REFUND"),
         pos & s.str.startswith("REFUND "),
-        pos & s.str.startswith("UPI RECEIVED"),
+        pos & s.str.contains(r"^UPI RECEIVED|REIMBURS|SPLIT|PAID BACK"),
         neg & s.str.contains("CREDIT CARD BILL"),
         neg & s.str.contains(r"^(?:SIP|RD|PPF|FD)\b|MUTUAL FUND|ZERODHA|BROKERAGE"),
         neg & s.str.contains("TRANSFER TO OWN"),
@@ -96,7 +96,7 @@ def match_returns(df, max_days=30):
             j = cand["txn_id"].iloc[-1]                          # most recent purchase
             d.loc[i, "matched_to"] = j
             used.add(j)
-    unmatched = d["txn_type"].isin(["refund", "reimbursement"]) & d["matched_to"].isna()
+    unmatched = (d["txn_type"] == "refund") & d["matched_to"].isna()
     d["needs_review"] = d["needs_review"] | unmatched
     return d
 

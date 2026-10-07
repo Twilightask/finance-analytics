@@ -38,16 +38,29 @@ def monthly_summary(df):
 
 
 def overview(df):
-    """Whole-period totals."""
+    """Whole-period totals. Cash savings exclude investments; total savings include them."""
     m = monthly_summary(df)
     income, expenses = m["income"].sum(), m["expenses"].sum()
+    cash = income - expenses
+    invest = -df.loc[df["txn_type"] == "investment", "amount"].sum()
+
+    def rate(x):
+        return round(x / income, 4) if income > 0 else None
+
     return {
-        "total_income": round(income, 2),
-        "total_expenses": round(expenses, 2),
-        "net_savings": round(income - expenses, 2),
-        "savings_rate": round((income - expenses) / income, 4) if income > 0 else None,
-        "total_investments": round(-df.loc[df["txn_type"] == "investment", "amount"].sum(), 2),
+        "baseline_income": round(income, 2),
+        "total_expenses": round(expenses, 2),            # net of refunds and reimbursements
+        "cash_savings": round(cash, 2),
+        "investment_contributions": round(invest, 2),
+        "total_savings": round(cash + invest, 2),
+        "cash_savings_rate": rate(cash),
+        "total_savings_rate": rate(cash + invest),
         "one_time_income": round(df.loc[df["one_time"], "amount"].sum(), 2),
+        # old names kept so existing code and tests keep working
+        "total_income": round(income, 2),
+        "net_savings": round(cash, 2),
+        "savings_rate": rate(cash),
+        "total_investments": round(invest, 2),
     }
 
 

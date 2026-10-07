@@ -171,6 +171,9 @@ def map_columns(df, source_file):
         "balance": df[bal_c].map(parse_amount) if bal_c else float("nan"),
         "source_file": source_file,
     })
+    keep = ~(out["description"].str.upper().str.strip().isin(["OPENING BALANCE", "BALANCE B/F"])
+             & (out["amount"].fillna(0) == 0))
+    out = out[keep].reset_index(drop=True)    
     bad = out["date"].isna() | out["amount"].isna()
     if bad.any():
         raise ValueError(f"{int(bad.sum())} rows in {source_file} have an unreadable "

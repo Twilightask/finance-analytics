@@ -153,12 +153,16 @@ def page_overview():
         st.warning("Fewer than 3 complete months: treat these numbers as low confidence.")
 
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Total income", rupees(o["total_income"]))
+    c1.metric("Baseline income", rupees(o["baseline_income"]))
     c2.metric("Net expenses", rupees(o["total_expenses"]))
-    c3.metric("Net savings", rupees(o["net_savings"]))
-    c4.metric("Savings rate", f"{o['savings_rate'] * 100:.1f}%" if o["savings_rate"] is not None else "n/a")
-    st.caption(f"Income excludes one-time income ({rupees(o['one_time_income'])}). "
-               f"Investments ({rupees(o['total_investments'])}) count as savings, not spending.")
+    c3.metric("Cash savings", rupees(o["cash_savings"]))
+    c4.metric("Cash savings rate", f"{o['cash_savings_rate'] * 100:.1f}%" if o["cash_savings_rate"] is not None else "n/a")
+    e1, e2, e3 = st.columns(3)
+    e1.metric("Investment contributions", rupees(o["investment_contributions"]))
+    e2.metric("Total savings (cash + investments)", rupees(o["total_savings"]))
+    e3.metric("Total savings rate", f"{o['total_savings_rate'] * 100:.1f}%" if o["total_savings_rate"] is not None else "n/a")
+    st.caption(f"One-time income excluded: {rupees(o['one_time_income'])}. Net expenses are after "
+               "refunds and reimbursements. Goals use cash savings, not investments.")
 
     st.subheader(f"Typical month (last {len(months)} complete months)")
     d1, d2, d3 = st.columns(3)
