@@ -136,6 +136,15 @@ def baseline_info(df):
     q = quality_report(df)
     return q["baseline_months"], q["low_confidence"]
 
+def rupee_labels(values):
+    """Indian-style labels for chart text: 62000 -> ₹62,000 (display only)."""
+    return [f"₹{v:,.0f}" for v in values]
+
+
+def month_label(s):
+    """'2026-07' -> 'Jul 2026'."""
+    return pd.to_datetime(s + "-01").strftime("%b %Y")
+
 
 def page_overview():
     st.title("Financial Overview")
@@ -176,21 +185,57 @@ def page_overview():
         st.info("Your income varies a lot from month to month, so averages may mislead.")
 
     m = monthly_summary(df).reset_index()
-    left, right = st.columns(2)
-    left.plotly_chart(px.bar(m, x="month", y=["income", "expenses"], barmode="group",
-                             title="Monthly income vs expenses"), use_container_width=True)
-    right.plotly_chart(px.bar(m, x="month", y="savings", title="Monthly savings"),
-                       use_container_width=True)
+    m["label"] = m["month"].map(month_label)
+    month_order = m["label"].tolist()
 
-    cats = category_spending(df).reset_index()
+    # 1) income vs expenses
+    inc_exp = m.melt(id_vars=["month", "label"], value_vars=["income", "expenses"],
+                     var_name="type", value_name="amount")
+    fig1 = px.bar(inc_exp, x="label", y="amount", color="type", barmode="group",
+                  text=rupee_labels(inc_exp["amount"]),
+                  category_orders={"label": month_order},
+                  labels={"label": "Month", "amount": "Amount (₹)", "type": ""},
+                  title="Monthly income vs expenses")
+    fig1.update_traces(textposition="outside", cliponaxis=False,
+                       hovertemplate="%{x}<br>%{fullData.name}: ₹%{y:,.0f}<extra></extra>")
+    fig1.update_xaxes(type="category")
+
+    # 2) monthly savings
+    fig2 = px.bar(m, x="label", y="savings", text=rupee_labels(m["savings"]),
+                  category_orders={"label": month_order},
+                  labels={"label": "Month", "savings": "Cash savings (₹)"},
+                  title="Monthly savings")
+    fig2.update_traces(textposition="outside", cliponaxis=False,
+                       hovertemplate="%{x}<br>Savings: ₹%{y:,.0f}<extra></extra>")
+    fig2.update_xaxes(type="category")
+
     left, right = st.columns(2)
-    left.plotly_chart(px.bar(cats.sort_values("spend"), x="spend", y="category",
-                             orientation="h", title="Spending by category"),
-                      use_container_width=True)
+    left.plotly_chart(fig1, use_container_width=True)
+    right.plotly_chart(fig2, use_container_width=True)
+
+    cats = category_spending(df).reset_index().sort_values("spend")
+    fig3 = px.bar(cats, x="spend", y="category", orientation="h",
+                  text=rupee_labels(cats["spend"]),
+                  labels={"spend": "Spend (₹)", "category": ""},
+                  title="Spending by category")
+    fig3.update_traces(textposition="outside", cliponaxis=False,
+                       hovertemplate="%{y}: ₹%{x:,.0f}<extra></extra>")
+
     m["change_pct"] = month_over_month(m.set_index("month")).values
-    right.plotly_chart(px.line(m, x="month", y="expenses", markers=True,
-                               hover_data=["change_pct"], title="Spending trend"),
-                       use_container_width=True)
+    fig4 = px.line(m, x="label", y="expenses", markers=True,
+                   text=rupee_labels(m["expenses"]),
+                   category_orders={"label": month_order},
+                   hover_data={"change_pct": True, "label": False},
+                   labels={"label": "Month", "expenses": "Expenses (₹)",
+                           "change_pct": "Change vs prev. month (%)"},
+                   title="Spending trend")
+    fig4.update_traces(textposition="top center")
+    fig4.update_xaxes(type="category")
+    fig4.update_yaxes(rangemode="tozero")
+
+    left, right = st.columns(2)
+    left.plotly_chart(fig3, use_container_width=True)
+    right.plotly_chart(fig4, use_container_width=True)
 
     sp = essential_split(df, months)
     st.write(f"Essential spending: **{rupees(sp['essential_monthly'])}/month**, "
