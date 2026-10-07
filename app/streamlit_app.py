@@ -283,6 +283,25 @@ def show_status(r):
         st.warning(w)
 
 
+STATUS_TEXT = {"on_track": "On track", "close": "Close", "off_track": "Off track",
+               "achieved": "Already achieved", "deadline_passed": "Deadline passed"}
+
+
+def goal_summary(r):
+    """One plain sentence explaining a goal result (display only)."""
+    if r["status"] in ("achieved", "deadline_passed"):
+        return r["message"]
+    need, have = r["required_monthly"], r["current_monthly_saving"]
+    text = (f"To reach this goal in **{r['months_left']} months** you need to save "
+            f"**{rupees(need)} every month**. ")
+    if have <= 0:
+        return text + "Based on your recent pattern, you are not saving anything each month."
+    text += f"Based on your recent pattern you save about **{rupees(have)}** a month. "
+    if r["gap"] > 0:
+        return text + f"That is **{rupees(r['gap'])} short** each month."
+    return text + f"That is **{rupees(-r['gap'])} more** than needed."
+
+
 def page_goal():
     st.title("Goal & What-If")
     df = get_data()
@@ -296,9 +315,13 @@ def page_goal():
     b = baseline(df, months)
     init_goal_state()
 
-    st.subheader("Your goal")
-    st.caption("The app tracks one active goal, because monthly savings cannot be "
-               "split across several goals reliably.")
+    st.info("**How this page works**\n\n"
+            "1. Tell us what you want to save for, how much, and by when.\n"
+            "2. We compare it with what you actually save each month.\n"
+            "3. Try changes (spend less, save extra, move the deadline) and see if the goal becomes realistic.")
+
+    # ---------- Step 1 ----------
+    st.subheader("Step 1: Your goal")
     if st.button("Use emergency-fund template (6 x essential monthly spending)"):
         sp = essential_split(df, months)
         st.session_state["g_name"] = "Emergency Fund"
@@ -307,9 +330,11 @@ def page_goal():
     c1, c2, c3, c4 = st.columns(4)
     c1.text_input("Goal name", key="g_name")
     c2.number_input("Target amount (₹)", min_value=0.0, step=1000.0, key="g_target")
-    c3.date_input("Target date", key="g_date")
-    c4.number_input("Already saved for this goal (₹)", min_value=0.0, step=1000.0, key="g_saved")
-    st.caption("Statements cannot show how much you saved for a specific goal, so enter it yourself.")
+    c3.date_input("Deadline", key="g_date")
+    c4.number_input("Already saved for this goal (₹)", min_value=0.0, step=1000.0, key="g_saved",
+                    help="Statements cannot show this, so enter it yourself.")
+    st.caption("One goal at a time, because your monthly savings cannot be split across "
+               "several goals reliably.")
 
     goal = {"name": st.session_state["g_name"], "target_amount": st.session_state["g_target"],
             "target_date": st.session_state["g_date"].isoformat(),
@@ -318,70 +343,83 @@ def page_goal():
         save_goal(goal)
         st.success("Goal saved.")
 
+    # ---------- Step 2 ----------
+    st.subheader("Step 2: Can you reach it?")
     today = date.today()
     r = evaluate_goal(goal, b["savings_mean"], today, low)
+    st.markdown(goal_summary(r))
     show_status(r)
-    if goal["target_amount"] > 0:
+    if goal["already_saved"] > 0 and goal["target_amount"] > 0:
         st.progress(min(goal["already_saved"] / goal["target_amount"], 1.0),
-                    text=f"Saved so far: {rupees(goal['already_saved'])} of {rupees(goal['target_amount'])}")
+                    text=f"Already saved: {rupees(goal['already_saved'])} of {rupees(goal['target_amount'])}")
 
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Remaining", rupees(r["remaining"]))
+    m1.metric("Still to save", rupees(r["remaining"]),
+              help="Target minus what you have already saved.")
     m2.metric("Months left", r["months_left"] if r["months_left"] is not None else "n/a")
-    m3.metric("Required per month", fmt(r["required_monthly"]))
-    m4.metric("You save per month", rupees(r["current_monthly_saving"]),
-              f"median {rupees(b['savings_median'])}", delta_color="off")
-    if r["gap"] is not None:
-        label = "Shortfall per month" if r["gap"] > 0 else "Surplus per month"
-        st.metric(label, rupees(abs(r["gap"])))
+    m3.metric("You need to save / month", fmt(r["required_monthly"]),
+              help="Still to save divided by months left.")
+    m4.metric("You save / month now", rupees(r["current_monthly_saving"]),
+              f"median {rupees(b['savings_median'])}", delta_color="off",
+              help="Average cash savings over your recent complete months (income minus spending, "
+                   "investments not counted). The median is the middle month.")
     if r["months_needed_at_current_pace"]:
-        st.caption(f"At your current pace this would take about "
+        st.caption(f"At your current pace this goal would take about "
                    f"{r['months_needed_at_current_pace']} months.")
     if r["gap"] is not None and r["gap"] > 0:
         drivers = gap_drivers(df, months)
         if drivers:
-            st.write("Biggest discretionary categories (monthly average): " +
+            st.write("Where you could cut back (biggest optional spending per month): " +
                      ", ".join(f"**{k}** {rupees(v)}" for k, v in drivers.items()))
 
-    st.subheader("What-if simulator")
-    st.caption("Assumes any money you cut is actually saved, not spent elsewhere.")
+    # ---------- Step 3 ----------
+    st.subheader("Step 3: Try changes (what-if)")
+    st.caption("Change anything below and see the result straight away. "
+               "Nothing is saved, and it assumes the money you cut is really saved.")
     spend = monthly_category_spend(df, months)
     usable = [c for c, v in spend.items() if v > 0 and c not in NOT_SPENDING]
     cuts = {}
-    for cat in [c for c in usable if c not in ESSENTIAL]:
-        cuts[cat] = st.slider(f"Reduce {cat} by % (now {rupees(spend[cat])}/month)",
-                              0, 100, 0, 5, key=f"cut_{cat}")
-    with st.expander("Essential categories"):
-        for cat in [c for c in usable if c in ESSENTIAL]:
-            cuts[cat] = st.slider(f"Reduce {cat} by % (now {rupees(spend[cat])}/month)",
+    with st.expander("Spend less in a category", expanded=True):
+        for cat in [c for c in usable if c not in ESSENTIAL]:
+            cuts[cat] = st.slider(f"{cat}: reduce by % (now {rupees(spend[cat])}/month)",
                                   0, 100, 0, 5, key=f"cut_{cat}")
-    extra = st.number_input("Extra monthly saving (₹)", min_value=0.0, step=500.0)
+    with st.expander("Essential categories (rent, bills...)"):
+        for cat in [c for c in usable if c in ESSENTIAL]:
+            cuts[cat] = st.slider(f"{cat}: reduce by % (now {rupees(spend[cat])}/month)",
+                                  0, 100, 0, 5, key=f"cut_{cat}")
+    extra = st.number_input("Save an extra amount every month (₹)", min_value=0.0, step=500.0)
     new_deadline = None
     if st.checkbox("Try a different deadline"):
-        new_deadline = st.date_input("New deadline", value=goal_default(goal), key="new_deadline").isoformat()
+        new_deadline = st.date_input("New deadline", value=goal_default(goal),
+                                     key="new_deadline").isoformat()
 
     s = simulate(goal, b["savings_mean"], spend, today, low,
                  cuts={c: p for c, p in cuts.items() if p > 0},
                  extra_saving=extra, new_deadline=new_deadline)
     cur, sc = s["current"], s["scenario"]
-    left, right = st.columns(2)
-    left.write("**Current**")
-    left.metric("Saving per month", rupees(cur["current_monthly_saving"]))
-    left.metric("Required per month", fmt(cur["required_monthly"]))
-    left.write(f"Status: **{cur['status']}**")
-    right.write("**Scenario**")
-    right.metric("Saving per month", rupees(sc["current_monthly_saving"]),
-                 f"+{rupees(s['monthly_improvement'])}")
-    right.metric("Required per month", fmt(sc["required_monthly"]))
-    right.write(f"Status: **{sc['status']}**")
-    show_status(sc)
 
-    cmp = pd.DataFrame({"Case": ["Current", "Scenario"],
+    st.markdown("**Result with your changes**")
+    if s["monthly_improvement"] == 0 and new_deadline is None:
+        st.caption("No changes yet. Move a slider or add an extra amount above.")
+    else:
+        st.markdown(goal_summary(sc))
+        show_status(sc)
+        a, bcol = st.columns(2)
+        a.metric("Before: you save / month", rupees(cur["current_monthly_saving"]))
+        bcol.metric("After: you save / month", rupees(sc["current_monthly_saving"]),
+                    f"+{rupees(s['monthly_improvement'])}")
+        st.caption(f"Before: **{STATUS_TEXT.get(cur['status'], cur['status'])}**  →  "
+                   f"After: **{STATUS_TEXT.get(sc['status'], sc['status'])}**")
+
+    cmp = pd.DataFrame({"Case": ["Now", "With your changes"],
                         "Monthly saving": [cur["current_monthly_saving"], sc["current_monthly_saving"]]})
-    fig = px.bar(cmp, x="Case", y="Monthly saving", title="Monthly saving vs requirement")
+    fig = px.bar(cmp, x="Case", y="Monthly saving",
+                 text=rupee_labels(cmp["Monthly saving"]),
+                 title="Your monthly saving vs what you need")
+    fig.update_traces(textposition="outside", cliponaxis=False)
     if sc["required_monthly"] is not None:
         fig.add_hline(y=sc["required_monthly"], line_dash="dash",
-                      annotation_text="Required (scenario)")
+                      annotation_text=f"Needed: {rupees(sc['required_monthly'])}")
     st.plotly_chart(fig, use_container_width=True)
 
 
