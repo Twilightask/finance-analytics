@@ -22,7 +22,7 @@ import plotly.express as px
 
 from core.analytics import (ESSENTIAL, baseline, category_spending, essential_split,
                             find_anomalies, month_over_month, monthly_summary,
-                            overview, recurring_payments, top_merchants)
+                            overview, recurring_payments, top_merchants, health_summary, fees_summary, cash_withdrawals, merchant_concentration, income_stability, spending_habits)
 from core.clean import quality_report
 
 from ai.assistant import QUESTIONS, explain
@@ -106,19 +106,9 @@ def page_upload():
     c3.metric("Categorized by rules", f"{coverage(df)}%")
     c4.metric("Needs review", int(df["needs_review"].sum()))
 
-    if rep:
-        st.write(f"Duplicates removed: **{rep['duplicates_removed']}**")
-        if rep["balance_ok"] is True:
-            st.success("Balance check passed.")
-        elif rep["balance_ok"] is False:
-            st.warning(f"Balance check failed at rows {rep['balance_bad_rows'][:10]}.")
-        if rep["partial_months"]:
-            st.warning(f"Partial months excluded from averages: {rep['partial_months']}")
-        if rep["low_confidence"]:
-            st.warning("Fewer than 3 complete months: results are low confidence.")
-        if rep["unitemized_card_payments"]:
-            st.warning(f"{rep['unitemized_card_payments']} credit-card bill payments "
-                       "counted as spending (no card statement uploaded).")
+    st.subheader("Data health")
+    for level, text in health_summary(df, rep["duplicates_removed"] if rep else None):
+        {"ok": st.success, "warn": st.warning, "info": st.info}[level](text)
 
     st.subheader("Preview")
     st.dataframe(df[["date", "description", "amount", "txn_type", "category"]].head(50),
@@ -531,9 +521,58 @@ def page_assistant():
         if res["note"]:
             st.info(res["note"])
 
+def page_insights():
+    st.title("Insights")
+    df = get_data()
+    if df is None:
+        st.info("No data yet. Go to Upload & Preview first.")
+        return
+    months, low = baseline_info(df)
+    if not months:
+        st.error("No complete months found.")
+        return
+    st.caption(f"Based on your last {len(months)} complete months.")
+
+    st.subheader("Income stability")
+    s = income_stability(df, months)
+    note = {"Stable": "Your income is almost the same every month.",
+            "Variable": "Your income changes somewhat from month to month.",
+            "Irregular": "Your income changes a lot, so averages can mislead. Look at the median.",
+            "No income": "No regular income was found."}[s["label"]]
+    st.write(f"**{s['label']}**. {note}" +
+             (f" (Month-to-month variation: {s['variation_pct']}%)" if s["variation_pct"] is not None else ""))
+
+    st.subheader("When do you spend?")
+    by_day, by_week = spending_habits(df, months)
+    l, r = st.columns(2)
+    for col, ser, title in [(l, by_day, "Spending by day of week"), (r, by_week, "Spending by week of month")]:
+        f = px.bar(x=ser.index, y=ser.values, text=rupee_labels(ser.values),
+                   labels={"x": "", "y": "Spend (₹)"}, title=title)
+        f.update_traces(textposition="outside", cliponaxis=False)
+        f.update_xaxes(type="category")
+        col.plotly_chart(f, use_container_width=True)
+
+    st.subheader("Where one merchant dominates")
+    mc = merchant_concentration(df)
+    if mc.empty:
+        st.caption("No category is mostly one merchant.")
+    for x in mc.itertuples():
+        st.write(f"**{x.share_pct:.0f}%** of your **{x.category}** spending is **{x.merchant}** "
+                 f"({rupees(x.amount)}). Switching or cutting this one merchant saves the most.")
+
+    st.subheader("Cash and fees")
+    c1, c2, c3 = st.columns(3)
+    cw, fe = cash_withdrawals(df, months), fees_summary(df, months)
+    c1.metric("Cash withdrawn / month", rupees(cw["monthly_avg"]))
+    c2.metric("Cash share of spending", f"{cw['share'] * 100:.1f}%")
+    c3.metric("Bank fees and penalties", rupees(fe["total"]), f"{fe['count']} charges", delta_color="off")
+    if cw["high"]:
+        st.warning("Cash is more than 10% of your spending. Cash can't be tracked by category, "
+                   "so part of your spending is invisible.")
+
 PAGES = {"Upload & Preview": page_upload, "Financial Overview": page_overview,
          "Goal & What-If": page_goal, "Transactions": page_transactions,
-         "AI Assistant": page_assistant}
+         "Insights": page_insights, "AI Assistant": page_assistant}
 
 if DEMO_MODE:
     PAGES.pop("AI Assistant")

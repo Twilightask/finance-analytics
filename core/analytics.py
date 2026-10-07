@@ -1,6 +1,7 @@
 """Stage 5: analytics engine. All numbers come from here; the UI only displays them."""
 import numpy as np
 import pandas as pd
+from core.clean import quality_report
 
 SPEND_TYPES = ["expense", "refund", "reimbursement"]
 
@@ -147,6 +148,97 @@ def essential_split(df, months):
     dis = s.loc[~s["category"].isin(ESSENTIAL), "spend"].sum() / len(months)
     return {"essential_monthly": round(ess, 2), "discretionary_monthly": round(dis, 2),
             "emergency_fund_3x": round(3 * ess, 2), "emergency_fund_6x": round(6 * ess, 2)}
+
+
+def health_summary(df, duplicates_removed=None):
+    """Plain-language data checks: list of (level, text), level = ok / warn / info."""
+    q = quality_report(df)
+    out = [("info", f"We read {len(df)} transactions from {q['date_start']} to {q['date_end']}.")]
+    if duplicates_removed is not None:
+        out.append(("info", f"{duplicates_removed} duplicate rows were removed."))
+    if q["balance_ok"] is True:
+        out.append(("ok", "Running balance matches every row, so no transaction was misread."))
+    elif q["balance_ok"] is False:
+        out.append(("warn", f"Running balance does not match at rows {q['balance_bad_rows'][:10]}."))
+    else:
+        out.append(("info", "No balance column, so the balance check was skipped."))
+    n_card = int(df["unitemized_card"].sum()) if "unitemized_card" in df else 0
+    if n_card:
+        out.append(("warn", f"{n_card} credit-card bill payments are counted as spending "
+                            "(no card statement was uploaded)."))
+    n_rev = int(df["needs_review"].sum()) if "needs_review" in df else 0
+    out.append(("ok", "No transactions need review.") if n_rev == 0
+               else ("warn", f"{n_rev} transactions need review."))
+    if q["partial_months"]:
+        out.append(("warn", f"Partial months left out of averages: {q['partial_months']}."))
+    if q["low_confidence"]:
+        out.append(("warn", "Fewer than 3 complete months, so results are low confidence."))
+    return out
+
+
+def fees_summary(df, months=None):
+    """Bank fees and penalties (category 'Fees & Charges')."""
+    s = spend_rows(df)
+    if months is not None:
+        s = s[s["month"].isin(months)]
+    f = s[s["category"] == "Fees & Charges"]
+    return {"total": round(f["spend"].sum(), 2), "count": int((f["txn_type"] == "expense").sum())}
+
+
+def cash_withdrawals(df, months, high_share=0.10):
+    """Cash is untraceable spending: show the amount and flag it when it is a big share."""
+    s = spend_rows(df)
+    s = s[s["month"].isin(months) & ~s["category"].isin(["Investment/Savings", "Transfer"])]
+    total = s["spend"].sum()
+    cash = s.loc[s["category"] == "Cash Withdrawal", "spend"].sum()
+    share = cash / total if total > 0 else 0.0
+    return {"monthly_avg": round(cash / len(months), 2), "share": round(share, 4),
+            "high": bool(share > high_share)}
+
+
+def merchant_concentration(df, min_share=0.40, min_txns=3):
+    """Categories where one merchant takes most of the spending."""
+    skip = ["Investment/Savings", "Transfer", "Other", "Rent/Housing"]
+    e = df[(df["txn_type"] == "expense") & ~df["category"].isin(skip)]
+    rows = []
+    for cat, g in e.groupby("category"):
+        if len(g) < min_txns:
+            continue
+        by = (-g["amount"]).groupby(g["description_clean"]).sum().sort_values(ascending=False)
+        if by.sum() <= 0:
+            continue
+        share = by.iloc[0] / by.sum()
+        if share >= min_share:
+            rows.append({"category": cat, "merchant": by.index[0],
+                         "share_pct": round(100 * share, 1), "amount": round(by.iloc[0], 2)})
+    cols = ["category", "merchant", "share_pct", "amount"]
+    return pd.DataFrame(rows, columns=cols).sort_values("share_pct", ascending=False).reset_index(drop=True)
+
+
+def income_stability(df, months):
+    """Stable (<=10% variation), Variable (<=20%), Irregular (>20%). 20% matches baseline()."""
+    inc = monthly_summary(df).loc[months, "income"]
+    mean = float(inc.mean())
+    if mean <= 0:
+        return {"label": "No income", "variation_pct": None}
+    cv = float(inc.std(ddof=0)) / mean
+    label = "Stable" if cv <= 0.10 else "Variable" if cv <= 0.20 else "Irregular"
+    return {"label": label, "variation_pct": round(100 * cv, 1)}
+
+
+WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+WEEK_LABELS = ["Days 1-7", "Days 8-14", "Days 15-21", "Days 22+"]
+
+
+def spending_habits(df, months):
+    """Total spending by weekday and by week of the month (expense rows only)."""
+    e = df[(df["txn_type"] == "expense") & _month(df).isin(months)]
+    spend = -e["amount"]
+    by_day = spend.groupby(e["date"].dt.day_name()).sum().reindex(WEEKDAYS).fillna(0.0)
+    bucket = ((e["date"].dt.day - 1) // 7).clip(upper=3)
+    by_week = spend.groupby(bucket).sum().reindex(range(4)).fillna(0.0)
+    by_week.index = WEEK_LABELS
+    return by_day.round(2), by_week.round(2)
 
 
 if __name__ == "__main__":

@@ -10,7 +10,10 @@ import pytest
 
 from core.analytics import (baseline, category_spending, month_over_month,
                             monthly_summary, overview, top_merchants,
-                            recurring_payments, find_anomalies, essential_split)
+                            recurring_payments, find_anomalies, essential_split,
+                            health_summary, fees_summary, cash_withdrawals,
+                            merchant_concentration, income_stability,
+                            spending_habits)
 from core.categorize import categorize, load_rules
 from core.clean import (load_all, remove_duplicates, classify, clean_all,
                         month_coverage, quality_report)
@@ -147,3 +150,62 @@ def test_reimbursement_keywords():
                        "amount": [800.0, 900.0, 1200.0, 500.0]})
     t = classify(df)["txn_type"].tolist()
     assert t == ["reimbursement", "reimbursement", "reimbursement", "review"]
+
+
+def _rows(rows, cols):
+    d = pd.DataFrame(rows, columns=cols)
+    d["date"] = pd.to_datetime(d["date"])
+    return d
+
+
+def test_fees_summary():
+    df = _rows([("2026-01-05", "expense", -100.0, "Fees & Charges"),
+                ("2026-01-09", "expense", -50.0, "Fees & Charges"),
+                ("2026-01-10", "expense", -900.0, "Food")],
+               ["date", "txn_type", "amount", "category"])
+    assert fees_summary(df, ["2026-01"]) == {"total": 150.0, "count": 2}
+
+
+def test_cash_withdrawals_flagged_when_high():
+    df = _rows([("2026-01-05", "expense", -2000.0, "Cash Withdrawal"),
+                ("2026-01-06", "expense", -8000.0, "Food")],
+               ["date", "txn_type", "amount", "category"])
+    c = cash_withdrawals(df, ["2026-01"])
+    assert c["monthly_avg"] == 2000 and c["share"] == 0.2 and c["high"] is True
+
+
+def test_merchant_concentration():
+    df = _rows([("2026-01-05", "expense", -600.0, "Food", "SWIGGY"),
+                ("2026-01-06", "expense", -200.0, "Food", "SWIGGY"),
+                ("2026-01-07", "expense", -200.0, "Food", "ZOMATO"),
+                ("2026-01-08", "expense", -18000.0, "Rent/Housing", "LANDLORD")],
+               ["date", "txn_type", "amount", "category", "description_clean"])
+    r = merchant_concentration(df)
+    assert len(r) == 1 and r.loc[0, "merchant"] == "SWIGGY" and r.loc[0, "share_pct"] == 80.0
+
+
+def test_income_stability_labels():
+    def lab(vals):
+        df = _rows([(f"2026-0{i + 1}-01", "income", v, False) for i, v in enumerate(vals)],
+                   ["date", "txn_type", "amount", "one_time"])
+        return income_stability(df, ["2026-01", "2026-02", "2026-03"])["label"]
+    assert lab([60000.0, 60000.0, 60000.0]) == "Stable"
+    assert lab([60000.0, 45000.0, 60000.0]) == "Variable"
+    assert lab([60000.0, 30000.0, 60000.0]) == "Irregular"
+
+
+def test_spending_habits():
+    df = _rows([("2026-01-05", "expense", -100.0),   # Monday
+                ("2026-01-10", "expense", -300.0),   # Saturday
+                ("2026-01-26", "expense", -50.0)],   # Monday
+               ["date", "txn_type", "amount"])
+    d, w = spending_habits(df, ["2026-01"])
+    assert d["Monday"] == 150 and d["Saturday"] == 300 and d["Tuesday"] == 0
+    assert w["Days 1-7"] == 100 and w["Days 8-14"] == 300 and w["Days 22+"] == 50
+
+
+def test_health_summary_on_demo_data():
+    h = health_summary(_df(), 5)
+    assert "468 transactions" in h[0][1]
+    assert any(l == "ok" and "balance" in t for l, t in h)
+    assert not any(l == "warn" for l, _ in h)
